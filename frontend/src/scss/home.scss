@@ -1,0 +1,27 @@
+#Home {
+    background-color: antiquewhite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    form {
+        width: fit-content;
+        height: fit-content;
+        border: 5px dotted white;
+        padding: 2rem;
+        border-radius: 1rem;
+    }
+    .filewrapper {
+        width: fit-content;
+        height: fit-content;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .submitwrapper {
+        width: fit-content;
+        height: fit-content;
+        margin-top: 1rem;
+        width: 6rem;
+    }
+}

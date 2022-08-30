@@ -1,0 +1,29 @@
+#Home {
+  background-color: antiquewhite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#Home form {
+  width: fit-content;
+  height: fit-content;
+  border: 5px dotted white;
+  padding: 2rem;
+  border-radius: 1rem;
+}
+#Home .filewrapper {
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#Home .submitwrapper {
+  width: fit-content;
+  height: fit-content;
+  margin-top: 1rem;
+  width: 6rem;
+}
+
+/*# sourceMappingURL=home.css.map */
