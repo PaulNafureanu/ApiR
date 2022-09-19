@@ -1,0 +1,53 @@
+.inputBox {
+  position: relative;
+  width: 20rem;
+  height: 2.5rem;
+  overflow: visible;
+}
+.inputBox input {
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background-color: #1d2b3a;
+  border-radius: 0.5rem;
+  outline: none;
+  color: white;
+  font-size: 1rem;
+  transition: 0.5s;
+  box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.04), 22.3px 22.3px 17.9px rgba(0, 0, 0, 0.06), 100px 100px 80px rgba(0, 0, 0, 0.1);
+}
+.inputBox span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 10px;
+  width: fit-content;
+  height: fit-content;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.25);
+  text-transform: uppercase;
+  transition: 0.5s;
+  font-size: 1rem;
+}
+.inputBox input:valid ~ span,
+.inputBox input:focus ~ span {
+  background-color: #45f3ff;
+  color: #1d2b3a;
+  border-radius: 2px;
+  transform: translateX(10px) translateY(-4px);
+  font-size: 0.65rem;
+  padding: 0 10px;
+  border-left: 1px solid #45f3ff;
+  border-right: 1px solid #45f3ff;
+  letter-spacing: 0.1rem;
+}
+.inputBox input:valid ~ span.em,
+.inputBox input:focus ~ span.em {
+  color: #45f3ff;
+  background-color: #1d2b3a;
+}
+.inputBox input:valid,
+.inputBox input:focus {
+  border: 1px solid #45f3ff;
+}
+
+/*# sourceMappingURL=inputField.css.map */
