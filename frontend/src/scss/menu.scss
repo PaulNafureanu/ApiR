@@ -1,0 +1,67 @@
+.mainMenu {
+  display: flex;
+  .left {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 35rem;
+    ul {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .logo {
+        width: 2rem;
+        margin: 0 0.5rem;
+        border-radius: 100%;
+        background-color: #222;
+      }
+      li {
+        display: flex;
+        width: fit-content;
+        min-width: 3rem;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #bbb;
+      }
+      li:hover {
+        background-color: rgba(119, 119, 119, 0.5);
+        border-radius: 0.2rem;
+      }
+    }
+  }
+  .center {
+    min-width: 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #bbb;
+  }
+  .right {
+    min-width: 5rem;
+    width: 30rem;
+    display: flex;
+    justify-content: right;
+    ul {
+      width: 50%;
+      margin: 1px solid yellow;
+      display: flex;
+    }
+    li {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .sideBarLeft {
+      background: url("./../../public/svgs/sidebarOpen.svg") no-repeat;
+    }
+    .sideBarCenter {
+      background: url("./../../public/svgs/sidebarOpen.svg") no-repeat;
+    }
+    .sideBarRight {
+      background: url("./../../public/svgs/sidebarOpen.svg") no-repeat;
+    }
+  }
+}

@@ -1,0 +1,26 @@
+#Workspace {
+  display: flex;
+  flex-direction: column;
+  .mainMenu {
+    background-color: #545454;
+    height: 1.8rem;
+  }
+  .userSpace {
+    display: flex;
+    .projectExplorer {
+      min-width: 20rem;
+      width: 34%;
+      display: flex;
+      .projectMenu {
+        width: 3.6rem;
+        background-color: #454545;
+      }
+      .folderExplorer {
+        background-color: #2a2a2a;
+      }
+    }
+    .fileViewer {
+      background-color: #222;
+    }
+  }
+}
