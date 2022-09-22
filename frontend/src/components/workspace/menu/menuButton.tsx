@@ -2,19 +2,21 @@ import * as React from "react";
 import "./../../../css/menuButton.css";
 interface MenuButtonProps {
   name: string;
-  isClicked: boolean;
   commands: any;
+  activePanel: string;
+  setActivePanel: (panel: string) => void;
 }
 
 const MenuButton: React.FunctionComponent<MenuButtonProps> = ({
   name,
-  isClicked,
   commands,
+  activePanel,
+  setActivePanel,
 }) => {
   const [isMouseOver, setIsMouseOver] = React.useState(false);
 
-  function returnMenuPanel(isClicked: boolean) {
-    if (isClicked && isMouseOver) {
+  function returnMenuPanel() {
+    if (activePanel == name) {
       let panelStyle = {
         height: `${2.5 * commands.count}rem`,
       };
@@ -22,8 +24,14 @@ const MenuButton: React.FunctionComponent<MenuButtonProps> = ({
       let HTMLCommands: Array<JSX.Element> = [];
 
       for (let i = 1; i <= commands.count; i++) {
+        let commandStyle;
+        if (commands.separators.includes(i))
+          commandStyle = { borderBottom: "1px solid #555" };
+        else {
+          commandStyle = { borderBottom: "none" };
+        }
         HTMLCommands.push(
-          <div className="command" key={i}>
+          <div className="command" key={i} style={commandStyle}>
             <div className="name">{commands.commands[i].name}</div>
             <div className="shortcut">{commands.commands[i].shortcut}</div>
           </div>
@@ -37,16 +45,18 @@ const MenuButton: React.FunctionComponent<MenuButtonProps> = ({
       );
     }
   }
+
   return (
     <div className="menuButton">
       <div
         className="button"
-        onMouseOver={() => setIsMouseOver(true)}
-        onMouseOut={() => setIsMouseOver(false)}
+        onMouseOver={() => {
+          if (activePanel != "none") setActivePanel(name);
+        }}
       >
         <p>{name}</p>
       </div>
-      {returnMenuPanel(isClicked)}
+      {returnMenuPanel()}
     </div>
   );
 };

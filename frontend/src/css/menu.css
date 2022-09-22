@@ -1,59 +1,64 @@
 .mainMenu {
-  display: flex;
-}
-.mainMenu .left {
+  font-size: 0.9rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 35rem;
+  color: #bbb;
+}
+.mainMenu .left {
+  width: 24rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 .mainMenu .left ul {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.mainMenu .left ul li {
-  display: flex;
-  width: fit-content;
-  min-width: 3rem;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: #bbb;
+  height: 100%;
 }
-.mainMenu .left ul li:hover {
+.mainMenu .left li {
+  cursor: pointer;
+  width: 4.8rem;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.mainMenu .left li:hover {
   background-color: rgba(119, 119, 119, 0.5);
   border-radius: 0.2rem;
 }
 .mainMenu .center {
-  min-width: 5rem;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 0.9rem;
-  color: #bbb;
+  height: 100%;
 }
 .mainMenu .right {
-  min-width: 5rem;
-  width: 30rem;
-  display: flex;
-  justify-content: right;
-}
-.mainMenu .right ul {
-  width: 50%;
-  margin: 1px solid yellow;
-  display: flex;
-}
-.mainMenu .right li {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100%;
 }
-.mainMenu .right .sidebar {
+.mainMenu .right ul {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.mainMenu .right ul .sidebar {
+  width: 2.4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 0.3rem;
+  height: 100%;
   cursor: pointer;
 }
-.mainMenu .right .sidebar:hover {
+.mainMenu .right ul .sidebar:hover {
   background-color: rgba(119, 119, 119, 0.5);
   border-radius: 0.2rem;
 }

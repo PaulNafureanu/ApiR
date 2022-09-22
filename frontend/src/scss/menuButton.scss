@@ -1,21 +1,19 @@
 .menuButton {
-  width: fit-content;
-  height: fit-content;
-  margin: 0;
-  padding: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
   .button {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: fit-content;
-    padding: 0.3rem 1rem;
-    margin: 0;
+    width: 100%;
+    height: 100%;
   }
-
   .menuPanel {
     position: absolute;
-    background-color: #353535;
     top: 2rem;
+    background-color: #353535;
     width: 20rem;
     display: flex;
     flex-direction: column;
@@ -27,23 +25,29 @@
       50px 50px 80px rgba(0, 0, 0, 0.07);
 
     .command {
-      color: #bbb;
-      font-size: 0.9rem;
       display: flex;
       justify-content: space-around;
-      align-items: center;
+      width: 100%;
+      height: 100%;
+      &:hover {
+        background-color: rgba(119, 119, 119, 0.5);
+        border-radius: 0.2rem;
+      }
       .name {
         display: flex;
         justify-content: left;
         align-items: center;
-        margin-left: 0.5rem;
+        margin-left: 1rem;
+        width: 65%;
+        height: 100%;
       }
       .shortcut {
-        width: 50%;
         display: flex;
         justify-content: right;
         align-items: center;
-        margin-right: 0.5rem;
+        margin-right: 1rem;
+        width: 35%;
+        height: 100%;
       }
     }
   }

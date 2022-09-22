@@ -1,27 +1,31 @@
 #Workspace {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 #Workspace .mainMenu {
   background-color: #545454;
-  height: 1.8rem;
+  height: 2rem;
 }
 #Workspace .userSpace {
   display: flex;
+  height: 100%;
 }
 #Workspace .userSpace .projectExplorer {
-  min-width: 20rem;
-  width: 34%;
   display: flex;
+  width: 24rem;
 }
 #Workspace .userSpace .projectExplorer .projectMenu {
-  width: 3.6rem;
+  width: 4rem;
   background-color: #454545;
 }
 #Workspace .userSpace .projectExplorer .folderExplorer {
+  width: 20rem;
   background-color: #2a2a2a;
 }
 #Workspace .userSpace .fileViewer {
+  width: 100%;
   background-color: #222;
 }
 

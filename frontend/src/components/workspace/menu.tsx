@@ -1,6 +1,6 @@
 import * as React from "react";
 import MenuButton from "./menu/menuButton";
-import commands from "./menu/menuCommands.json";
+import menuCommands from "./menu/menuCommands";
 import "./../../css/menu.css";
 
 interface MenuProps {
@@ -14,39 +14,35 @@ const Menu: React.FunctionComponent<MenuProps> = ({
   isRightSidebarOpen,
   handleOnClickSidebar,
 }) => {
-  const [isClicked, setIsClicked] = React.useState(false);
+  const menus: ["File", "Edit", "Go", "Run", "Help"] = [
+    "File",
+    "Edit",
+    "Go",
+    "Run",
+    "Help",
+  ];
+  const [activePanel, setActivePanel] = React.useState("none");
 
-  function handleClick() {
-    if (isClicked) {
-      setIsClicked(false);
+  function handleClick(panel: string) {
+    if (activePanel == "none") {
+      setActivePanel(panel);
     } else {
-      setIsClicked(true);
+      setActivePanel("none");
     }
   }
 
   function returnSidebar(sideBar: "left" | "right", isOpen: boolean) {
     if (sideBar == "left") {
       if (isOpen) {
-        return (
-          <img
-            src="./svgs/sidebarOpen.svg"
-            onClick={() => handleOnClickSidebar("left")}
-          />
-        );
+        return <img src="./svgs/sidebarOpen.svg" />;
       } else {
-        return (
-          <img
-            src="./svgs/sidebarClose.svg"
-            onClick={() => handleOnClickSidebar("left")}
-          />
-        );
+        return <img src="./svgs/sidebarClose.svg" />;
       }
     } else {
       if (isOpen) {
         return (
           <img
             src="./svgs/sidebarOpen.svg"
-            onClick={() => handleOnClickSidebar("right")}
             style={{ transform: "scale(-1)" }}
           />
         );
@@ -54,7 +50,6 @@ const Menu: React.FunctionComponent<MenuProps> = ({
         return (
           <img
             src="./svgs/sidebarClose.svg"
-            onClick={() => handleOnClickSidebar("right")}
             style={{ transform: "scale(-1)" }}
           />
         );
@@ -62,54 +57,38 @@ const Menu: React.FunctionComponent<MenuProps> = ({
     }
   }
 
+  function getMenus(): JSX.Element[] {
+    let menuElements: JSX.Element[] = [];
+
+    for (let i = 0; i < menus.length; i++) {
+      menuElements.push(
+        <li onClick={() => handleClick(menus[i])} key={menus[i]}>
+          <MenuButton
+            name={menus[i]}
+            activePanel={activePanel}
+            commands={menuCommands[menus[i]]}
+            key={menus[i]}
+            setActivePanel={setActivePanel}
+          />
+        </li>
+      );
+    }
+
+    return menuElements;
+  }
+
   return (
     <div className="mainMenu noselect">
       <div className="left">
-        <ul>
-          <li onClick={handleClick}>
-            <MenuButton
-              name="File"
-              isClicked={isClicked}
-              commands={commands.file}
-            />
-          </li>
-          <li onClick={handleClick}>
-            <MenuButton
-              name="Edit"
-              isClicked={isClicked}
-              commands={commands.edit}
-            />
-          </li>
-          <li onClick={handleClick}>
-            <MenuButton
-              name="Go"
-              isClicked={isClicked}
-              commands={commands.go}
-            />
-          </li>
-          <li onClick={handleClick}>
-            <MenuButton
-              name="Run"
-              isClicked={isClicked}
-              commands={commands.run}
-            />
-          </li>
-          <li onClick={handleClick}>
-            <MenuButton
-              name="Help"
-              isClicked={isClicked}
-              commands={commands.help}
-            />
-          </li>
-        </ul>
+        <ul>{getMenus()}</ul>
       </div>
       <div className="center">ApiRandomizer</div>
       <div className="right">
         <ul>
-          <li className="sidebar">
+          <li className="sidebar" onClick={() => handleOnClickSidebar("left")}>
             {returnSidebar("left", isLeftSidebarOpen)}
           </li>
-          <li className="sidebar">
+          <li className="sidebar" onClick={() => handleOnClickSidebar("right")}>
             {returnSidebar("right", isRightSidebarOpen)}
           </li>
         </ul>

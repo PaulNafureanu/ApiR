@@ -1,9 +1,13 @@
 @import url('https://meyerweb.com/eric/tools/css/reset/reset.css');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700;900&display=swap');
-* {
-    box-sizing: border-box;
-    overflow: hidden;
+
+:root, body, #root{
+    font-size: 16px;
     width: 100%;
     height: 100%;
+}
+
+*{
+    box-sizing: border-box;
     font-family: 'Poppins', sans-serif !important;
 }
