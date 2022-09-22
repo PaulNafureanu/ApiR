@@ -3,9 +3,17 @@ import MenuButton from "./menu/menuButton";
 import commands from "./menu/menuCommands.json";
 import "./../../css/menu.css";
 
-interface MenuProps {}
+interface MenuProps {
+  isLeftSidebarOpen: boolean;
+  isRightSidebarOpen: boolean;
+  handleOnClickSidebar: (sidebar: "left" | "right") => void;
+}
 
-const Menu: React.FunctionComponent<MenuProps> = () => {
+const Menu: React.FunctionComponent<MenuProps> = ({
+  isLeftSidebarOpen,
+  isRightSidebarOpen,
+  handleOnClickSidebar,
+}) => {
   const [isClicked, setIsClicked] = React.useState(false);
 
   function handleClick() {
@@ -16,13 +24,48 @@ const Menu: React.FunctionComponent<MenuProps> = () => {
     }
   }
 
+  function returnSidebar(sideBar: "left" | "right", isOpen: boolean) {
+    if (sideBar == "left") {
+      if (isOpen) {
+        return (
+          <img
+            src="./svgs/sidebarOpen.svg"
+            onClick={() => handleOnClickSidebar("left")}
+          />
+        );
+      } else {
+        return (
+          <img
+            src="./svgs/sidebarClose.svg"
+            onClick={() => handleOnClickSidebar("left")}
+          />
+        );
+      }
+    } else {
+      if (isOpen) {
+        return (
+          <img
+            src="./svgs/sidebarOpen.svg"
+            onClick={() => handleOnClickSidebar("right")}
+            style={{ transform: "scale(-1)" }}
+          />
+        );
+      } else {
+        return (
+          <img
+            src="./svgs/sidebarClose.svg"
+            onClick={() => handleOnClickSidebar("right")}
+            style={{ transform: "scale(-1)" }}
+          />
+        );
+      }
+    }
+  }
+
   return (
     <div className="mainMenu noselect">
       <div className="left">
         <ul>
-          <div className="logo">
-            <img src="./logos/logo.svg"></img>
-          </div>
           <li onClick={handleClick}>
             <MenuButton
               name="File"
@@ -63,9 +106,12 @@ const Menu: React.FunctionComponent<MenuProps> = () => {
       <div className="center">ApiRandomizer</div>
       <div className="right">
         <ul>
-          <li className="sideBarLeft"></li>
-          <li className="sideBarCenter"></li>
-          <li className="sideBarRight"></li>
+          <li className="sidebar">
+            {returnSidebar("left", isLeftSidebarOpen)}
+          </li>
+          <li className="sidebar">
+            {returnSidebar("right", isRightSidebarOpen)}
+          </li>
         </ul>
       </div>
     </div>

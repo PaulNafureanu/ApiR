@@ -12,12 +12,6 @@
   justify-content: space-between;
   align-items: center;
 }
-.mainMenu .left ul .logo {
-  width: 2rem;
-  margin: 0 0.5rem;
-  border-radius: 100%;
-  background-color: #222;
-}
 .mainMenu .left ul li {
   display: flex;
   width: fit-content;
@@ -56,14 +50,12 @@
   justify-content: center;
   align-items: center;
 }
-.mainMenu .right .sideBarLeft {
-  background: url("./../../public/svgs/sidebarOpen.svg") no-repeat;
+.mainMenu .right .sidebar {
+  cursor: pointer;
 }
-.mainMenu .right .sideBarCenter {
-  background: url("./../../public/svgs/sidebarOpen.svg") no-repeat;
-}
-.mainMenu .right .sideBarRight {
-  background: url("./../../public/svgs/sidebarOpen.svg") no-repeat;
+.mainMenu .right .sidebar:hover {
+  background-color: rgba(119, 119, 119, 0.5);
+  border-radius: 0.2rem;
 }
 
 /*# sourceMappingURL=menu.css.map */

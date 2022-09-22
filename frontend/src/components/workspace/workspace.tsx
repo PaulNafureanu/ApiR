@@ -9,9 +9,25 @@ import FileViewer from "./fileViewer";
 interface WorkSpaceProps {}
 
 const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
+  const [isLeftSidebarOpen, setIsLeftSidebarOpen] = React.useState(true);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = React.useState(false);
+
+  function handleOnClickSidebar(sidebar: "left" | "right") {
+    if (sidebar == "left") {
+      setIsLeftSidebarOpen(!isLeftSidebarOpen);
+    } else {
+      setIsRightSidebarOpen(!isRightSidebarOpen);
+    }
+  }
   return (
     <div id="Workspace">
-      <Menu />
+      <Menu
+        isLeftSidebarOpen={isLeftSidebarOpen}
+        isRightSidebarOpen={isRightSidebarOpen}
+        handleOnClickSidebar={(sidebar: "left" | "right") =>
+          handleOnClickSidebar(sidebar)
+        }
+      />
       <div className="userSpace">
         <div className="projectExplorer">
           <ProjectMenu />
