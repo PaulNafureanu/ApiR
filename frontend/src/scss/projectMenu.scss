@@ -1,3 +1,42 @@
 .projectMenu {
-  //   border: 1px solid green;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .up {
+    margin-top: 1rem;
+  }
+  .down {
+    // margin-bottom: 0.5rem;
+  }
+  img {
+    cursor: pointer;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    &:hover {
+      background-color: rgba(119, 119, 119, 0.5);
+      border-radius: 0.2rem;
+    }
+  }
+  .active {
+    filter: invert(100%) sepia(0%) saturate(4032%) hue-rotate(184deg)
+      brightness(106%) contrast(73%);
+  }
+  .not-active {
+    filter: invert(49%) sepia(14%) saturate(10%) hue-rotate(322deg)
+      brightness(92%) contrast(98%);
+    &:hover {
+      filter: invert(100%) sepia(0%) saturate(4032%) hue-rotate(184deg)
+        brightness(106%) contrast(73%);
+    }
+  }
 }

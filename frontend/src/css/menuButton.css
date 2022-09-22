@@ -12,6 +12,7 @@
   height: 100%;
 }
 .menuButton .menuPanel {
+  z-index: 1;
   position: absolute;
   top: 2rem;
   background-color: #353535;

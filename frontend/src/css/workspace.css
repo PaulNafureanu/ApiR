@@ -11,22 +11,27 @@
 #Workspace .userSpace {
   display: flex;
   height: 100%;
+  justify-content: space-between;
 }
 #Workspace .userSpace .projectExplorer {
   display: flex;
   width: 24rem;
 }
 #Workspace .userSpace .projectExplorer .projectMenu {
-  width: 4rem;
+  width: 3rem;
   background-color: #454545;
 }
 #Workspace .userSpace .projectExplorer .folderExplorer {
-  width: 20rem;
+  width: 21rem;
   background-color: #2a2a2a;
 }
 #Workspace .userSpace .fileViewer {
   width: 100%;
   background-color: #222;
+}
+#Workspace .userSpace .rightSidebar {
+  min-width: 15rem;
+  background-color: #2a2a2a;
 }
 
 /*# sourceMappingURL=workspace.css.map */

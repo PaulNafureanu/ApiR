@@ -82,7 +82,7 @@ const Menu: React.FunctionComponent<MenuProps> = ({
       <div className="left">
         <ul>{getMenus()}</ul>
       </div>
-      <div className="center">ApiRandomizer</div>
+      <div className="center"></div>
       <div className="right">
         <ul>
           <li className="sidebar" onClick={() => handleOnClickSidebar("left")}>

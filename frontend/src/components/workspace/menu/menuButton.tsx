@@ -13,8 +13,6 @@ const MenuButton: React.FunctionComponent<MenuButtonProps> = ({
   activePanel,
   setActivePanel,
 }) => {
-  const [isMouseOver, setIsMouseOver] = React.useState(false);
-
   function returnMenuPanel() {
     if (activePanel == name) {
       let panelStyle = {
