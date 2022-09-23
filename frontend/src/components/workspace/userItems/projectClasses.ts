@@ -1,20 +1,27 @@
 class ProjectItem{
     static idCount: number = 0;
     id: number;
+    itemName: string;
+    layer: number;
     parent: ProjectItem | null;
     children: ProjectItem[];
+    itemType: "folder" | "file" | "";
     iconPath: string;
     constructor(children: ProjectItem[] = [], iconPath:string = "") {
         this.id = ProjectItem.idCount;
         ProjectItem.idCount++;
+        this.itemName = "";
+        this.layer = 0;
         this.parent = null;
         this.children = children;
+        this.itemType = "";
         this.iconPath = iconPath;
         return this;
     }
 
     addChild(child: ProjectItem) {
         this.children.push(child);
+        child.layer = this.layer + 1;
         child.parent = this;
         return this;
     }
@@ -42,26 +49,35 @@ class ProjectItem{
 class ProjectRoot extends ProjectItem {
     AccountName: string;
     selectedItems: ProjectItem[];
-    constructor(AccountName: string = "DEMO", children: ProjectItem[] = [], selectedItems: ProjectItem[] = []) {
+    constructor(AccountName: string = "DEMO", children: UserFolder[] | UserFile[] = [], selectedItems: ProjectItem[] = []) {
         super(children);
         this.AccountName = AccountName;
         this.selectedItems = selectedItems;
     }
+
+    createFile(file: UserFile, setProjectRoot: (projectRoot: ProjectRoot) => void) {
+        this.addChild(file);
+        setProjectRoot(this);
+    }
 }
 
 class UserFolder extends ProjectItem{
-    FolderName: string;
-    constructor(FolderName: string, children: ProjectItem[] = [], iconPath: string = "") {
+    isOpen: boolean;
+    constructor(FolderName: string, children: ProjectItem[] = [], iconPath: string = "", isOpen:boolean = false) {
         super(children, iconPath);
-        this.FolderName = FolderName;
+        this.itemType = "folder";
+        this.itemName = FolderName;
+        this.isOpen = isOpen;
     }
 }
 
 class UserFile extends ProjectItem{
-    FileName: string;
-    constructor(FileName: string, iconPath: string = "") {
+    isViewed: boolean;
+    constructor(FileName: string, iconPath: string = "", isViewed: boolean = true) {
         super(undefined, iconPath);
-        this.FileName = FileName;
+        this.itemType = "file";
+        this.itemName = FileName;
+        this.isViewed = isViewed;
     }
 }
 

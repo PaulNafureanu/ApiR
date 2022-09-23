@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as UserProject from "./projectClasses";
+import * as UserProject from "./userItems/projectClasses";
 import Menu from "./menu";
 import "./../../css/workspace.css";
 import "./../../css/utils.css";
@@ -23,6 +23,15 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
     } else {
       setIsRightSidebarOpen(!isRightSidebarOpen);
     }
+  }
+
+  function handleClickFolderExplorer(value: string) {
+    // let newProjectRoot = new UserProject.ProjectRoot("DEMO");
+    // Object.assign(newProjectRoot, projectRoot);
+    // newProjectRoot.addChild(
+    //   new UserProject.UserFile("New File Here", "./svgs/addFile.svg")
+    // );
+    // setProjectRoot(newProjectRoot);
   }
 
   function getCustomUserSpaceStyle() {
@@ -66,6 +75,8 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
           <ProjectMenu />
           <FolderExplorer
             customStyle={getCustomUserSpaceStyle().FolderExplorerStyle}
+            projectRoot={projectRoot}
+            handleClick={(value) => handleClickFolderExplorer(value)}
           />
         </div>
         <FileViewer />

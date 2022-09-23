@@ -1,15 +1,21 @@
 import * as React from "react";
+import * as UserProject from "./userItems/projectClasses";
+import UserItem from "./userItems/userItem";
 import "./../../css/folderExplorer.css";
 import "./../../css/utils.css";
 
 interface FolderExplorerProps {
   customStyle: any;
   accountName?: string;
+  projectRoot: UserProject.ProjectRoot;
+  handleClick: (value: string) => void;
 }
 
 const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
   customStyle,
   accountName = "demo",
+  projectRoot,
+  handleClick,
 }) => {
   const [isMouseOverAccName, setIsMouseOverAccName] = React.useState(false);
   const [isMouseOverFolderExp, setIsMouseOverFolderExp] = React.useState(false);
@@ -30,6 +36,23 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
     }
 
     return FolderExplorerStyle;
+  }
+
+  function getUserItems(): JSX.Element[] {
+    let items: JSX.Element[] = [];
+
+    for (let i = 0; i < projectRoot.children.length; i++) {
+      items.push(
+        <UserItem
+          itemType={projectRoot.children[i].itemType}
+          itemName={projectRoot.children[i].itemName}
+          iconPath={projectRoot.children[i].iconPath}
+          key={i}
+        />
+      );
+    }
+
+    return items;
   }
 
   return (
@@ -53,7 +76,12 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
           </p>
         </div>
         <ul className="buttons" style={FolderExplorerStyle().ButtonStyle}>
-          <li className="createFile">
+          <li
+            className="createFile"
+            onClick={() => {
+              handleClick("createFile");
+            }}
+          >
             <img src="./svgs/addFile.svg" alt="Create New File" />
           </li>
           <li className="createFolder">
@@ -80,11 +108,7 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
         </ul>
       </div>
       <div className="files">
-        <ul>
-          <li>file1</li>
-          <li>file2</li>
-          <li>file3</li>
-        </ul>
+        <ul>{getUserItems()}</ul>
       </div>
     </div>
   );

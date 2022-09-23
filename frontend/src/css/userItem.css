@@ -1,0 +1,12 @@
+.userItem {
+  height: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.userItem img {
+  width: 1rem;
+  height: 1rem;
+}
+
+/*# sourceMappingURL=userItem.css.map */
