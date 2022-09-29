@@ -1,18 +1,18 @@
 import * as React from "react";
-import * as UserProject from "./userItems/projectClasses";
-import UserItem from "./userItems/userItem";
+import UserProject from "../../namespaces/UserProject";
+import UserItem from "./userItem";
 import "./../../css/folderExplorer.css";
 import "./../../css/utils.css";
 
 interface FolderExplorerProps {
   customStyle: any;
-  projectRoot: UserProject.ProjectRoot;
-  handleClick: (value: string) => void;
+  userProjectRoot: UserProject.UserProjectRoot;
+  handleClick: (value: UserProject.MethodsSupported) => void;
 }
 
 const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
   customStyle,
-  projectRoot,
+  userProjectRoot,
   handleClick,
 }) => {
   const [isMouseOverAccName, setIsMouseOverAccName] = React.useState(false);
@@ -36,21 +36,29 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
     return FolderExplorerStyle;
   }
 
-  function getUserItems(): JSX.Element[] {
-    let items: JSX.Element[] = [];
+  function getUserItems(
+    userItemTreeNodes: UserProject.TreeNode[]
+  ): JSX.Element[] {
+    let JSXItems: JSX.Element[] = [];
+    for (let i = 0; i < userItemTreeNodes.length; i++) {
+      let userItem = UserProject.UserItem.getItemReferenceById(
+        userItemTreeNodes[i].id
+      );
 
-    for (let i = 0; i < projectRoot.children.length; i++) {
-      items.push(
+      JSXItems.push(
         <UserItem
-          itemType={projectRoot.children[i].itemType}
-          itemName={projectRoot.children[i].itemName}
-          iconColor={projectRoot.children[i].itemColor}
+          itemType={userItem.itemType}
+          itemName={userItem.itemName}
+          iconColor={userItem.iconColor}
           key={i}
         />
       );
-    }
 
-    return items;
+      if (userItemTreeNodes[i].children.length > 0) {
+        JSXItems.concat(getUserItems(userItemTreeNodes[i].children));
+      }
+    }
+    return JSXItems;
   }
 
   return (
@@ -70,7 +78,7 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
             <img src="./svgs/arrow.svg" alt="Drop down arrow"></img>
           </div>
           <p style={FolderExplorerStyle().AccountNameStyle}>
-            {projectRoot.AccountName.toUpperCase()}
+            {userProjectRoot.accountName.toUpperCase()}
           </p>
         </div>
         <ul className="buttons" style={FolderExplorerStyle().ButtonStyle}>
@@ -141,7 +149,7 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
         </ul>
       </div>
       <div className="files">
-        <ul>{getUserItems()}</ul>
+        <ul>{getUserItems(userProjectRoot.userItemsTree.root)}</ul>
       </div>
     </div>
   );

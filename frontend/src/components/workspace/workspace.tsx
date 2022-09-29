@@ -1,13 +1,13 @@
 import * as React from "react";
-import * as UserProject from "./userItems/projectClasses";
+import UserProject from "../../namespaces/UserProject";
 import Menu from "./menu";
-import "./../../css/workspace.css";
-import "./../../css/utils.css";
 import ProjectMenu from "./projectMenu";
 import FolderExplorer from "./folderExplorer";
 import FileViewer from "./fileViewer";
 import RightSidebar from "./rightSidebar";
 import CreateMenu from "./createMenu";
+import "./../../css/workspace.css";
+import "./../../css/utils.css";
 
 interface WorkSpaceProps {}
 
@@ -15,9 +15,12 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = React.useState(true);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = React.useState(false);
   const [isCreateMenuOpen, setIsCreateMenuOpen] = React.useState("none");
-  const [currentOperation, setCurrentOperation] = React.useState("none");
-  const [projectRoot, setProjectRoot] = React.useState(
-    new UserProject.ProjectRoot("Leo")
+  const [currentOperation, setCurrentOperation]: [
+    UserProject.MethodsSupported,
+    React.Dispatch<React.SetStateAction<UserProject.MethodsSupported>>
+  ] = React.useState(UserProject.castString("createFile"));
+  const [userProjectRoot, setUserProjectRoot] = React.useState(
+    new UserProject.UserProjectRoot("Leo")
   );
 
   const [newItemName, setNewItemName] = React.useState("");
@@ -31,19 +34,18 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
     }
   }
 
-  function handleClickFolderExplorer(value: string) {
+  function handleClickFolderExplorer(value: UserProject.MethodsSupported) {
     setCurrentOperation(value);
     let createValues = ["createFile", "createFolder", "rename", "delete"];
     if (createValues.includes(value)) {
       setIsCreateMenuOpen(value);
     } else {
-      let newProjectRoot = projectRoot.callMethod(
-        value,
-        projectRoot,
+      let newUserProjectRoot = UserProject.UserProjectRoot[value](
+        userProjectRoot,
         newItemName,
         newItemColor
       );
-      setProjectRoot(newProjectRoot);
+      setUserProjectRoot(newUserProjectRoot);
     }
   }
 
@@ -88,7 +90,7 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
           <ProjectMenu />
           <FolderExplorer
             customStyle={getCustomUserSpaceStyle().FolderExplorerStyle}
-            projectRoot={projectRoot}
+            userProjectRoot={userProjectRoot}
             handleClick={(value) => handleClickFolderExplorer(value)}
           />
         </div>
@@ -99,14 +101,11 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
         <CreateMenu
           isCreateMenuOpen={isCreateMenuOpen}
           handleSubmit={() => {
-            let newProjectRoot = projectRoot.callMethod(
-              currentOperation,
-              projectRoot,
-              newItemName,
-              newItemColor
-            );
+            let newUserProjectRoot = UserProject.UserProjectRoot[
+              currentOperation
+            ](userProjectRoot, newItemName, newItemColor);
             setIsCreateMenuOpen("none");
-            setProjectRoot(newProjectRoot);
+            setUserProjectRoot(newUserProjectRoot);
           }}
           newItemName={newItemName}
           newItemColor={newItemColor}

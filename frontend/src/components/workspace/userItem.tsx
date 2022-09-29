@@ -1,8 +1,9 @@
 import * as React from "react";
-import "./../../../css/userItem.css";
+import UserProject from "../../namespaces/UserProject";
+import "./../../css/userItem.css";
 
 interface UserItemProps {
-  itemType: string;
+  itemType: UserProject.ItemType;
   itemName: string;
   iconColor: string;
 }
@@ -12,20 +13,9 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
   itemName,
   iconColor,
 }) => {
-  function getIconItem(itemIcon: string) {
-    switch (itemIcon) {
-      case "folder": {
-        return (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 512 512"
-            fill={iconColor}
-          >
-            <path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H298.5c-17 0-33.3-6.7-45.3-18.7L226.7 50.7c-12-12-28.3-18.7-45.3-18.7H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z" />
-          </svg>
-        );
-      }
-      case "openFolder": {
+  function getIconItem(itemType: UserProject.ItemType) {
+    switch (itemType) {
+      case "OpenFolder": {
         return (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -37,7 +27,7 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
         );
       }
 
-      case "closedFolder": {
+      case "ClosedFolder": {
         return (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -49,7 +39,7 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
         );
       }
 
-      case "file": {
+      case "GeneralFile": {
         return (
           <svg
             xmlns="http://www.w3.org/2000/svg"
