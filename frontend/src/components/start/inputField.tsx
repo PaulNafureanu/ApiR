@@ -3,14 +3,20 @@ import "./../../css/inputField.css";
 
 interface InputFieldProps {
   inputType?: string;
-  value: string;
+  spanValue: string;
   em?: boolean;
+  value?: string;
+  handleInputChange: (value: string) => void;
+  handleSubmit?: () => void;
+  autoFocus?: boolean;
 }
 
 const InputField: React.FunctionComponent<InputFieldProps> = ({
   inputType = "text",
-  value,
+  spanValue,
   em = false,
+  value = "",
+  handleInputChange,
 }) => {
   function getClassName(em: boolean) {
     if (em) return "em";
@@ -20,8 +26,13 @@ const InputField: React.FunctionComponent<InputFieldProps> = ({
   }
   return (
     <div className="inputBox">
-      <input type={inputType} required={true}></input>
-      <span className={getClassName(em)}>{value}</span>
+      <input
+        value={value}
+        onChange={(event) => handleInputChange(event.target.value)}
+        type={inputType}
+        required={true}
+      ></input>
+      <span className={getClassName(em)}>{spanValue}</span>
     </div>
   );
 };

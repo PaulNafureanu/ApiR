@@ -3,7 +3,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  img {
+  border: 1px solid green;
+  .icons {
+    display: flex;
+    border: 1px solid red;
+  }
+  img,
+  svg {
     width: 1rem;
     height: 1rem;
   }

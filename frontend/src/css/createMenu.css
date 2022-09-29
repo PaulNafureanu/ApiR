@@ -1,0 +1,78 @@
+.createMenu {
+  position: absolute;
+  z-index: 2;
+  font-size: 0.8rem;
+  background-color: #1d2b3a;
+  border-radius: 0.5rem;
+  border: 1px solid #1d2b3a;
+  width: 30rem;
+  height: 5rem;
+  left: calc(50% - 15rem);
+  top: 25%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.121), 22.3px 22.3px 17.9px rgba(0, 0, 0, 0.179), 100px 100px 80px rgba(0, 0, 0, 0.3);
+}
+.createMenu .headerMenu {
+  background-color: #0a0f14;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+  height: 1.5rem;
+  color: #ddd;
+}
+.createMenu .bodyMenu {
+  display: flex;
+  justify-content: space-around;
+  height: 100%;
+  padding: 0 1rem;
+  align-items: center;
+}
+.createMenu .iconColor {
+  margin: 0 1rem;
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.createMenu .iconColor input {
+  border-radius: 100%;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  background-color: transparent;
+}
+.createMenu .inputBox {
+  width: fit-content;
+  height: 2.2rem;
+}
+.createMenu button {
+  height: 2rem;
+  width: 8.5rem;
+  background-color: transparent;
+  background-color: #45f3ff;
+  color: #1d2b3a;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.5rem;
+  font-weight: bold;
+  transition: 0.1s;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem;
+  box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.121), 22.3px 22.3px 17.9px rgba(0, 0, 0, 0.179), 100px 100px 80px rgba(0, 0, 0, 0.3);
+}
+.createMenu button:hover {
+  font-size: 0.9rem;
+  outline: 1px solid white;
+  transition: 0.2s;
+}
+
+/*# sourceMappingURL=createMenu.css.map */

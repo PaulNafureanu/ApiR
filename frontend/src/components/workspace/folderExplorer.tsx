@@ -6,14 +6,12 @@ import "./../../css/utils.css";
 
 interface FolderExplorerProps {
   customStyle: any;
-  accountName?: string;
   projectRoot: UserProject.ProjectRoot;
   handleClick: (value: string) => void;
 }
 
 const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
   customStyle,
-  accountName = "demo",
   projectRoot,
   handleClick,
 }) => {
@@ -46,7 +44,7 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
         <UserItem
           itemType={projectRoot.children[i].itemType}
           itemName={projectRoot.children[i].itemName}
-          iconPath={projectRoot.children[i].iconPath}
+          iconColor={projectRoot.children[i].itemColor}
           key={i}
         />
       );
@@ -72,7 +70,7 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
             <img src="./svgs/arrow.svg" alt="Drop down arrow"></img>
           </div>
           <p style={FolderExplorerStyle().AccountNameStyle}>
-            {accountName.toUpperCase()}
+            {projectRoot.AccountName.toUpperCase()}
           </p>
         </div>
         <ul className="buttons" style={FolderExplorerStyle().ButtonStyle}>
@@ -84,25 +82,60 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
           >
             <img src="./svgs/addFile.svg" alt="Create New File" />
           </li>
-          <li className="createFolder">
+          <li
+            className="createFolder"
+            onClick={() => {
+              handleClick("createFolder");
+            }}
+          >
             <img src="./svgs/addFolder.svg" alt="Create New Folder" />
           </li>
-          <li className="uploadFile">
+          <li
+            className="uploadFile"
+            onClick={() => {
+              handleClick("uploadFile");
+            }}
+          >
             <img src="./svgs/uploadFile.svg" alt="Uplaod New File" />
           </li>
-          <li className="uploadFolder">
+          <li
+            className="uploadFolder"
+            onClick={() => {
+              handleClick("uploadFolder");
+            }}
+          >
             <img src="./svgs/uploadFolder.svg" alt="Upload New Folder" />
           </li>
-          <li className="rename">
+          <li
+            className="rename"
+            onClick={() => {
+              handleClick("rename");
+            }}
+          >
             <img src="./svgs/rename.svg" alt="Rename" />
           </li>
-          <li className="refresh">
+          <li
+            className="refresh"
+            onClick={() => {
+              handleClick("refresh");
+            }}
+          >
             <img src="./svgs/refresh.svg" alt="Refresh Project" />
           </li>
-          <li className="delete">
+          <li
+            className="delete"
+            onClick={() => {
+              handleClick("delete");
+            }}
+          >
             <img src="./svgs/delete.svg" alt="Delete" />
           </li>
-          <li className="collapseFolders">
+          <li
+            className="collapseFolders"
+            onClick={() => {
+              handleClick("collapseFolders");
+            }}
+          >
             <img src="./svgs/collapseFolders.svg" alt="Collapse Folders" />
           </li>
         </ul>

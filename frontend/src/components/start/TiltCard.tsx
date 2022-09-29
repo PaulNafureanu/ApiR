@@ -15,6 +15,9 @@ const TiltCard: React.FunctionComponent<TiltProps> = ({
   cssClass = "Tilt",
 }) => {
   const tiltRef = React.createRef<HTMLDivElement>();
+  const [userEmail, setUserEmail] = React.useState("");
+  const [userPassword, setUserPassword] = React.useState("");
+  const [userRepeatPassword, setUserRepeatPassword] = React.useState("");
   const [isLoginIn, setLoginIn] = React.useState(true);
 
   React.useEffect(() => {
@@ -28,9 +31,19 @@ const TiltCard: React.FunctionComponent<TiltProps> = ({
       bodyForm = (
         <React.Fragment>
           <div className="inputForm">
-            <InputField value="Enter Email" em={true} />
+            <InputField
+              value={userEmail}
+              handleInputChange={(value) => setUserEmail(value)}
+              spanValue="Enter Email"
+              em={true}
+            />
             <div className="p">
-              <InputField value="Enter Password" inputType="password" />
+              <InputField
+                value={userPassword}
+                handleInputChange={(value) => setUserPassword(value)}
+                spanValue="Enter Password"
+                inputType="password"
+              />
               <div className="s">
                 <span className="fp">Forget Password?</span>
                 <span className="sgnUp">Sign Up Here</span>
@@ -48,10 +61,25 @@ const TiltCard: React.FunctionComponent<TiltProps> = ({
       bodyForm = (
         <React.Fragment>
           <div className="inputForm">
-            <InputField value="Enter Email" em={true} />
-            <InputField value="Enter Password" inputType="password" />
+            <InputField
+              value={userEmail}
+              handleInputChange={(value) => setUserEmail(value)}
+              spanValue="Enter Email"
+              em={true}
+            />
+            <InputField
+              value={userPassword}
+              handleInputChange={(value) => setUserPassword(value)}
+              spanValue="Enter Password"
+              inputType="password"
+            />
             <div className="p">
-              <InputField value="Repeat Password" inputType="password" />
+              <InputField
+                value={userRepeatPassword}
+                handleInputChange={(value) => setUserRepeatPassword(value)}
+                spanValue="Repeat Password"
+                inputType="password"
+              />
               <div className="s">
                 <span className="a">Do you have an account?</span>
                 <span className="sgnUp"> Log In Here</span>

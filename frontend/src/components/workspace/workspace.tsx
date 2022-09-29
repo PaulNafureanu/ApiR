@@ -7,15 +7,21 @@ import ProjectMenu from "./projectMenu";
 import FolderExplorer from "./folderExplorer";
 import FileViewer from "./fileViewer";
 import RightSidebar from "./rightSidebar";
+import CreateMenu from "./createMenu";
 
 interface WorkSpaceProps {}
 
 const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = React.useState(true);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = React.useState(false);
+  const [isCreateMenuOpen, setIsCreateMenuOpen] = React.useState("none");
+  const [currentOperation, setCurrentOperation] = React.useState("none");
   const [projectRoot, setProjectRoot] = React.useState(
-    new UserProject.ProjectRoot("DEMO")
+    new UserProject.ProjectRoot("Leo")
   );
+
+  const [newItemName, setNewItemName] = React.useState("");
+  const [newItemColor, setNewItemColor] = React.useState("#000000");
 
   function handleOnClickSidebar(sidebar: "left" | "right") {
     if (sidebar == "left") {
@@ -26,12 +32,19 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
   }
 
   function handleClickFolderExplorer(value: string) {
-    // let newProjectRoot = new UserProject.ProjectRoot("DEMO");
-    // Object.assign(newProjectRoot, projectRoot);
-    // newProjectRoot.addChild(
-    //   new UserProject.UserFile("New File Here", "./svgs/addFile.svg")
-    // );
-    // setProjectRoot(newProjectRoot);
+    setCurrentOperation(value);
+    let createValues = ["createFile", "createFolder", "rename", "delete"];
+    if (createValues.includes(value)) {
+      setIsCreateMenuOpen(value);
+    } else {
+      let newProjectRoot = projectRoot.callMethod(
+        value,
+        projectRoot,
+        newItemName,
+        newItemColor
+      );
+      setProjectRoot(newProjectRoot);
+    }
   }
 
   function getCustomUserSpaceStyle() {
@@ -82,6 +95,23 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
         <FileViewer />
         <RightSidebar
           customStyle={getCustomUserSpaceStyle().RightSidebarStyle}
+        />
+        <CreateMenu
+          isCreateMenuOpen={isCreateMenuOpen}
+          handleSubmit={() => {
+            let newProjectRoot = projectRoot.callMethod(
+              currentOperation,
+              projectRoot,
+              newItemName,
+              newItemColor
+            );
+            setIsCreateMenuOpen("none");
+            setProjectRoot(newProjectRoot);
+          }}
+          newItemName={newItemName}
+          newItemColor={newItemColor}
+          handleInputNameChange={(value) => setNewItemName(value)}
+          handleInputColorChange={(value) => setNewItemColor(value)}
         />
       </div>
     </div>
