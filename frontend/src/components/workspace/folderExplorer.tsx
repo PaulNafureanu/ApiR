@@ -8,12 +8,14 @@ interface FolderExplorerProps {
   customStyle: any;
   userProjectRoot: UserProject.UserProjectRoot;
   handleClick: (value: UserProject.MethodsSupported) => void;
+  handleUserItemClick: (id: number) => void;
 }
 
 const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
   customStyle,
   userProjectRoot,
   handleClick,
+  handleUserItemClick,
 }) => {
   const [isMouseOverAccName, setIsMouseOverAccName] = React.useState(false);
   const [isMouseOverFolderExp, setIsMouseOverFolderExp] = React.useState(false);
@@ -45,11 +47,24 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
         userItemTreeNodes[i].id
       );
 
+      let isItemSelected = UserProject.UserItem.SelectedUserItemIdList.includes(
+        userItemTreeNodes[i].id
+      );
+
+      let isItemActive =
+        UserProject.UserItem.activeItemId == userItemTreeNodes[i].id;
+
       JSXItems.push(
         <UserItem
+          itemId={userItem.id}
+          isOpen={userItem.isOpen}
+          isSelected={isItemSelected}
+          isActive={isItemActive}
           itemType={userItem.itemType}
           itemName={userItem.itemName}
           iconColor={userItem.iconColor}
+          layer={userItemTreeNodes[i].layer}
+          handleUserItemClick={handleUserItemClick}
           key={i}
         />
       );

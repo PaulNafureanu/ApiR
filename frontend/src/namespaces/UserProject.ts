@@ -18,6 +18,7 @@ namespace UserProject {
     static IdCount: number = 0;
     static UserItemReferenceIdList: ItemReferenceId[] = []; //A complete reference with all the items (folders and files) created by the user accessed by their id
     static SelectedUserItemIdList: number[]; //The user items that are currently selected by the user.
+    static activeItemId: number;
     id: number;
     isOpen: boolean;
     itemName: string;
@@ -31,6 +32,7 @@ namespace UserProject {
       isOpen: boolean
     ) {
       UserItem.IdCount += 1;
+      UserItem.activeItemId = UserItem.IdCount;
       this.id = UserItem.IdCount;
       this.isOpen = isOpen;
       this.itemName = itemName;
@@ -326,13 +328,6 @@ namespace UserProject {
       return newUserProjectRoot;
       console.log("Collapse Folders");
     }
-    // static none(currentUserProjectRoot: UserProjectRoot): UserProjectRoot {
-    //   let newUserProjectRoot = UserProjectRoot.createNewUserProjectRoot(
-    //     currentUserProjectRoot
-    //   );
-    //   return newUserProjectRoot;
-    //   console.log("Testing");
-    // }
   }
 }
 

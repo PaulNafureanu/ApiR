@@ -3,15 +3,27 @@ import UserProject from "../../namespaces/UserProject";
 import "./../../css/userItem.css";
 
 interface UserItemProps {
+  itemId: number;
+  isOpen: boolean;
+  isSelected: boolean;
+  isActive: boolean;
   itemType: UserProject.ItemType;
   itemName: string;
   iconColor: string;
+  layer: number;
+  handleUserItemClick: (id: number) => void;
 }
 
 const UserItem: React.FunctionComponent<UserItemProps> = ({
+  itemId,
+  isOpen,
+  isSelected,
+  isActive,
   itemType,
   itemName,
   iconColor,
+  layer,
+  handleUserItemClick,
 }) => {
   function getIconItem(itemType: UserProject.ItemType) {
     switch (itemType) {
@@ -85,8 +97,30 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
     }
   }
 
+  function getUserItemStyle() {
+    let userItemStyle = {};
+    if (isOpen) {
+      userItemStyle = {
+        backgroundColor: "#1d2b3a88",
+        border: "1px solid #45f3ff",
+        color: "white",
+      };
+    } else {
+      userItemStyle = {
+        backgroundColor: "rgba(255, 255, 255, 0.15)",
+        border: "none",
+        color: "inherit",
+      };
+    }
+    return userItemStyle;
+  }
+
   return (
-    <div className={"userItem " + itemType}>
+    <div
+      className={"userItem " + itemType}
+      onClick={() => handleUserItemClick(itemId)}
+      style={getUserItemStyle()}
+    >
       <div className="icons">
         {itemType.includes("Folder") ? (
           <div className="dropDownIcon">
