@@ -8,7 +8,11 @@ interface FolderExplorerProps {
   customStyle: any;
   userProjectRoot: UserProject.UserProjectRoot;
   handleClick: (value: UserProject.MethodsSupported) => void;
-  handleUserItemClick: (id: number) => void;
+  handleUserItemClick: (
+    id: number,
+    isCtrlPressed: boolean,
+    isShiftPressed: boolean
+  ) => void;
 }
 
 const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
@@ -52,7 +56,7 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
       );
 
       let isItemActive =
-        UserProject.UserItem.activeItemId == userItemTreeNodes[i].id;
+        UserProject.UserItem.activeFileId == userItemTreeNodes[i].id;
 
       JSXItems.push(
         <UserItem

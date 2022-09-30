@@ -49,30 +49,17 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
     }
   }
 
-  function handleUserItemClick(itemId: number) {
-    //TODO: Needs to be refactor/moved to UserProject.ts
-    let userItem = UserProject.UserItem.getItemReferenceById(itemId);
-
-    let newUserProjectRoot = new UserProject.UserProjectRoot();
-    Object.assign(newUserProjectRoot, userProjectRoot);
-
-    userItem.isOpen = !userItem.isOpen;
-    UserProject.UserItem.activeItemId = itemId;
-
-    if (UserProject.UserItem.SelectedUserItemIdList.includes(itemId)) {
-      for (
-        let i = 0;
-        i < UserProject.UserItem.SelectedUserItemIdList.length;
-        i++
-      ) {
-        if (UserProject.UserItem.SelectedUserItemIdList[i] == itemId) {
-          UserProject.UserItem.SelectedUserItemIdList.splice(i, 1);
-        }
-      }
-    } else {
-      UserProject.UserItem.SelectedUserItemIdList.push(itemId);
-    }
-
+  function handleUserItemClick(
+    itemId: number,
+    isCtrlPressed: boolean,
+    isShiftPressed: boolean
+  ) {
+    let newUserProjectRoot = UserProject.UserProjectRoot.handleUserItemClick(
+      userProjectRoot,
+      itemId,
+      isCtrlPressed,
+      isShiftPressed
+    );
     setUserProjectRoot(newUserProjectRoot);
   }
 
@@ -119,7 +106,9 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
             customStyle={getCustomUserSpaceStyle().FolderExplorerStyle}
             userProjectRoot={userProjectRoot}
             handleClick={(value) => handleClickFolderExplorer(value)}
-            handleUserItemClick={(id) => handleUserItemClick(id)}
+            handleUserItemClick={(id, isCtrlPressed, isShiftPressed) =>
+              handleUserItemClick(id, isCtrlPressed, isShiftPressed)
+            }
           />
         </div>
         <FileViewer />

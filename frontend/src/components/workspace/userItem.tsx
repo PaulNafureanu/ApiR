@@ -11,7 +11,11 @@ interface UserItemProps {
   itemName: string;
   iconColor: string;
   layer: number;
-  handleUserItemClick: (id: number) => void;
+  handleUserItemClick: (
+    id: number,
+    isCtrlPressed: boolean,
+    isShiftPressed: boolean
+  ) => void;
 }
 
 const UserItem: React.FunctionComponent<UserItemProps> = ({
@@ -99,7 +103,22 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
 
   function getUserItemStyle() {
     let userItemStyle = {};
-    if (isOpen) {
+
+    if (isSelected) {
+      userItemStyle = {
+        backgroundColor: "rgba(255, 255, 255, 0.15)",
+        border: "none",
+        color: "inherit",
+      };
+    } else {
+      userItemStyle = {
+        backgroundColor: "transparent",
+        border: "none",
+        color: "inherit",
+      };
+    }
+
+    if (isActive) {
       userItemStyle = {
         backgroundColor: "#1d2b3a88",
         border: "1px solid #45f3ff",
@@ -118,7 +137,17 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
   return (
     <div
       className={"userItem " + itemType}
-      onClick={() => handleUserItemClick(itemId)}
+      onClick={(e) => {
+        let isCtrlPressed = false;
+        let isShiftPressed = false;
+        if (e.ctrlKey) {
+          isCtrlPressed = true;
+        }
+        if (e.shiftKey) {
+          isShiftPressed = true;
+        }
+        handleUserItemClick(itemId, isCtrlPressed, isShiftPressed);
+      }}
       style={getUserItemStyle()}
     >
       <div className="icons">

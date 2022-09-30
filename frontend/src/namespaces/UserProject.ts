@@ -9,6 +9,13 @@ namespace UserProject {
     | "OpenFolder"
     | "ClosedFolder";
 
+  export function getGeneralType(itemType: ItemType): "Folder" | "File" {
+    if (["OpenFolder", "ClosedFolder"].includes(itemType)) {
+      return "Folder";
+    }
+    return "File";
+  }
+
   export interface ItemReferenceId {
     itemId: number;
     itemReference: UserItem;
@@ -18,7 +25,7 @@ namespace UserProject {
     static IdCount: number = 0;
     static UserItemReferenceIdList: ItemReferenceId[] = []; //A complete reference with all the items (folders and files) created by the user accessed by their id
     static SelectedUserItemIdList: number[]; //The user items that are currently selected by the user.
-    static activeItemId: number;
+    static activeFileId: number = 0;
     id: number;
     isOpen: boolean;
     itemName: string;
@@ -32,12 +39,28 @@ namespace UserProject {
       isOpen: boolean
     ) {
       UserItem.IdCount += 1;
-      UserItem.activeItemId = UserItem.IdCount;
+      if (getGeneralType(itemType) == "File") {
+        UserItem.activeFileId = UserItem.IdCount;
+      }
       this.id = UserItem.IdCount;
       this.isOpen = isOpen;
       this.itemName = itemName;
       this.itemType = itemType;
       this.iconColor = iconColor;
+    }
+
+    static addSelectedUserItemId(itemId: number) {
+      // if (UserItem.SelectedUserItemIdList.includes(itemId)) return;
+      UserItem.SelectedUserItemIdList.push(itemId);
+    }
+
+    static removeSelectedUserItemId(itemId: number) {
+      // if (!UserItem.SelectedUserItemIdList.includes(itemId)) return;
+      for (let i = 0; i < UserItem.SelectedUserItemIdList.length; i++) {
+        if (UserItem.SelectedUserItemIdList[i] == itemId) {
+          UserItem.SelectedUserItemIdList.splice(i, 1);
+        }
+      }
     }
 
     addItemReference(itemId: number, itemReference: UserItem) {
@@ -80,7 +103,7 @@ namespace UserProject {
       itemName: string,
       itemType: ItemType = "GeneralFile",
       iconColor: string = "#000000",
-      isOpen: boolean = false
+      isOpen: boolean = true
     ) {
       super(itemName, itemType, iconColor, isOpen);
       this.addItemReference(this.id, this);
@@ -261,8 +284,9 @@ namespace UserProject {
         currentUserProjectRoot
       );
 
-      let newFile = new UserFile(itemName, "GeneralFile", iconColor, true);
+      let newFile = new UserFile(itemName, "GeneralFile", iconColor);
       newUserProjectRoot.addUserItem(newFile);
+      UserItem.activeFileId = newFile.id;
 
       return newUserProjectRoot;
     }
@@ -327,6 +351,136 @@ namespace UserProject {
       );
       return newUserProjectRoot;
       console.log("Collapse Folders");
+    }
+    static handleUserItemClick(
+      currentUserProjectRoot: UserProjectRoot,
+      itemId: number,
+      isCtrlPressed: boolean,
+      isShiftPressed: boolean
+    ): UserProjectRoot {
+      let newUserProjectRoot = UserProjectRoot.createNewUserProjectRoot(
+        currentUserProjectRoot
+      );
+
+      console.log(isCtrlPressed);
+
+      let userItem = UserProject.UserItem.getItemReferenceById(itemId);
+      let generalType = getGeneralType(userItem.itemType);
+
+      if (isCtrlPressed) {
+        if (UserFile.SelectedUserItemIdList.includes(itemId)) {
+          UserItem.removeSelectedUserItemId(itemId);
+        } else {
+          UserItem.addSelectedUserItemId(itemId);
+        }
+      } else {
+        if (isShiftPressed) {
+          let previousUserItemSelectedId =
+            UserItem.SelectedUserItemIdList[
+              UserItem.SelectedUserItemIdList.length - 1
+            ];
+          let currentUserItemSelectedId = itemId;
+
+          let rootNodes = newUserProjectRoot.userItemsTree.root;
+
+          let selectedUserItemsToAdd: number[] =
+            UserProjectRoot.findSelectedItemsToAdd(
+              currentUserItemSelectedId,
+              previousUserItemSelectedId,
+              rootNodes,
+              false,
+              false
+            );
+
+          for (let i = 0; i < selectedUserItemsToAdd.length; i++) {
+            if (
+              UserItem.SelectedUserItemIdList.includes(
+                selectedUserItemsToAdd[i]
+              )
+            ) {
+              continue;
+            } else {
+              UserItem.addSelectedUserItemId(selectedUserItemsToAdd[i]);
+            }
+          }
+        } else {
+          UserItem.SelectedUserItemIdList = [];
+          UserItem.SelectedUserItemIdList.push(itemId);
+
+          if (generalType == "File") {
+            UserItem.activeFileId = itemId;
+            userItem.isOpen = true;
+          } else {
+            userItem.isOpen = !userItem.isOpen;
+          }
+        }
+      }
+
+      return newUserProjectRoot;
+    }
+
+    static findSelectedItemsToAdd(
+      currentUserItemSelectedId: number,
+      previousUserItemSelectedId: number,
+      userItemsTreeNodes: TreeNode[],
+      startAdding: boolean,
+      stopAdding: boolean
+    ): number[] {
+      if (stopAdding) {
+        return [];
+      }
+      let selectedUserItemsToAdd: number[] = [];
+      for (let i = 0; userItemsTreeNodes.length; i++) {
+        if (stopAdding) {
+          return selectedUserItemsToAdd;
+        }
+        if (startAdding) {
+          if (
+            userItemsTreeNodes[i].id == currentUserItemSelectedId ||
+            userItemsTreeNodes[i].id == previousUserItemSelectedId
+          ) {
+            selectedUserItemsToAdd.push(userItemsTreeNodes[i].id);
+            stopAdding = true;
+            return selectedUserItemsToAdd;
+          }
+
+          selectedUserItemsToAdd.push(userItemsTreeNodes[i].id);
+
+          if (userItemsTreeNodes[i].children.length > 0) {
+            selectedUserItemsToAdd.concat(
+              UserProjectRoot.findSelectedItemsToAdd(
+                currentUserItemSelectedId,
+                previousUserItemSelectedId,
+                userItemsTreeNodes[i].children,
+                startAdding,
+                stopAdding
+              )
+            );
+          }
+        } else {
+          if (
+            userItemsTreeNodes[i].id == currentUserItemSelectedId ||
+            userItemsTreeNodes[i].id == previousUserItemSelectedId
+          ) {
+            startAdding = true;
+            selectedUserItemsToAdd.push(userItemsTreeNodes[i].id);
+          }
+
+          if (userItemsTreeNodes[i].children.length > 0) {
+            selectedUserItemsToAdd.concat(
+              UserProjectRoot.findSelectedItemsToAdd(
+                currentUserItemSelectedId,
+                previousUserItemSelectedId,
+                userItemsTreeNodes[i].children,
+                startAdding,
+                stopAdding
+              )
+            );
+          }
+        }
+      }
+
+      return selectedUserItemsToAdd;
     }
   }
 }
