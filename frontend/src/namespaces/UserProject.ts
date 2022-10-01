@@ -130,7 +130,7 @@ namespace UserProject {
     children: TreeNode[];
   }
 
-  export type NodeOperation = "AddNode" | "RemoveNode";
+  export type NodeOperation = "AddNode" | "RemoveNode" | "FindNode";
 
   export class Tree {
     root: TreeNode[];
@@ -145,30 +145,39 @@ namespace UserProject {
       nodeIdToFind: number,
       operation: NodeOperation,
       childNodeId: number = 0
-    ): boolean {
+    ): boolean | TreeNode {
       for (let i = 0; i < treeNodes.length; i++) {
         if (treeNodes[i].id == nodeIdToFind) {
-          if (operation == "AddNode") {
-            treeNodes[i].children.push({
-              id: childNodeId,
-              layer: treeNodes[i].layer + 1,
-              children: [],
-            });
-          } else {
-            treeNodes.splice(i, 1);
+          switch (operation) {
+            case "AddNode": {
+              treeNodes[i].children.push({
+                id: childNodeId,
+                layer: treeNodes[i].layer + 1,
+                children: [],
+              });
+              return true;
+            }
+            case "RemoveNode": {
+              treeNodes.splice(i, 1);
+              return true;
+            }
+            case "FindNode": {
+              return treeNodes[i];
+            }
+            default: {
+              return false;
+            }
           }
-          return true;
         }
         if (treeNodes[i].children.length > 0) {
-          if (
-            this.findNode(
-              treeNodes[i].children,
-              nodeIdToFind,
-              operation,
-              childNodeId
-            )
-          ) {
-            return true;
+          let child = this.findNode(
+            treeNodes[i].children,
+            nodeIdToFind,
+            operation,
+            childNodeId
+          );
+          if (child) {
+            return child;
           }
         }
       }
@@ -247,9 +256,6 @@ namespace UserProject {
 
     private addUserItem(userItem: UserItem) {
       if (this.activeWorkFolderId == 0) {
-        if (userItem.constructor.name == "UserFolder") {
-          this.activeWorkFolderId = userItem.id;
-        }
         this.userItemsTree.addNode(0, userItem.id);
       } else {
         this.userItemsTree.addNode(this.activeWorkFolderId, userItem.id);
@@ -263,6 +269,19 @@ namespace UserProject {
 
       UserItem.cleanItemReferenceById(userItemId);
       this.userItemsTree.removeNode(userItemId);
+    }
+
+    private findUserItem(userItemId: number): TreeNode {
+      let result = this.userItemsTree.findNode(
+        this.userItemsTree.root,
+        userItemId,
+        "FindNode"
+      );
+
+      if (typeof result == "boolean") return { id: 0, layer: 0, children: [] };
+      else {
+        return result;
+      }
     }
 
     /**User Project Methods for creating, modifying and deleting files and folders created by the user*/
@@ -301,6 +320,7 @@ namespace UserProject {
 
       let newFolder = new UserFolder(itemName, "ClosedFolder", iconColor);
       newUserProjectRoot.addUserItem(newFolder);
+      newUserProjectRoot.activeWorkFolderId = newFolder.id;
 
       return newUserProjectRoot;
     }
@@ -362,8 +382,6 @@ namespace UserProject {
         currentUserProjectRoot
       );
 
-      console.log(isCtrlPressed);
-
       let userItem = UserProject.UserItem.getItemReferenceById(itemId);
       let generalType = getGeneralType(userItem.itemType);
 
@@ -381,26 +399,44 @@ namespace UserProject {
             ];
           let currentUserItemSelectedId = itemId;
 
-          let rootNodes = newUserProjectRoot.userItemsTree.root;
+          //TODO: add also to the selection the files included in end folders
+          // let userItem = UserItem.getItemReferenceById(
+          //   currentUserItemSelectedId
+          // );
+          // let generalType = getGeneralType(userItem.itemType);
+          // if (generalType == "Folder") {
+          //   let currentUserItemTreeNode = newUserProjectRoot.findUserItem(
+          //     currentUserItemSelectedId
+          //   );
+          //   let len = currentUserItemTreeNode.children.length;
+          //   if (currentUserItemTreeNode.id != 0 && len > 0) {
+          //     currentUserItemSelectedId =
+          //       currentUserItemTreeNode.children[len - 1].id;
+          //   }
+          // }
 
-          let selectedUserItemsToAdd: number[] =
-            UserProjectRoot.findSelectedItemsToAdd(
-              currentUserItemSelectedId,
-              previousUserItemSelectedId,
-              rootNodes,
-              false,
-              false
-            );
+          if (currentUserItemSelectedId != previousUserItemSelectedId) {
+            let rootNodes = newUserProjectRoot.userItemsTree.root;
 
-          for (let i = 0; i < selectedUserItemsToAdd.length; i++) {
-            if (
-              UserItem.SelectedUserItemIdList.includes(
-                selectedUserItemsToAdd[i]
-              )
-            ) {
-              continue;
-            } else {
-              UserItem.addSelectedUserItemId(selectedUserItemsToAdd[i]);
+            let selectedUserItemsToAdd: number[] =
+              UserProjectRoot.findSelectedItemsToAdd(
+                currentUserItemSelectedId,
+                previousUserItemSelectedId,
+                rootNodes,
+                false,
+                false
+              );
+
+            for (let i = 0; i < selectedUserItemsToAdd.length; i++) {
+              if (
+                UserItem.SelectedUserItemIdList.includes(
+                  selectedUserItemsToAdd[i]
+                )
+              ) {
+                continue;
+              } else {
+                UserItem.addSelectedUserItemId(selectedUserItemsToAdd[i]);
+              }
             }
           }
         } else {
@@ -412,6 +448,7 @@ namespace UserProject {
             userItem.isOpen = true;
           } else {
             userItem.isOpen = !userItem.isOpen;
+            newUserProjectRoot.activeWorkFolderId = itemId;
           }
         }
       }
@@ -430,7 +467,7 @@ namespace UserProject {
         return [];
       }
       let selectedUserItemsToAdd: number[] = [];
-      for (let i = 0; userItemsTreeNodes.length; i++) {
+      for (let i = 0; i < userItemsTreeNodes.length; i++) {
         if (stopAdding) {
           return selectedUserItemsToAdd;
         }
@@ -441,13 +478,14 @@ namespace UserProject {
           ) {
             selectedUserItemsToAdd.push(userItemsTreeNodes[i].id);
             stopAdding = true;
+            startAdding = false;
             return selectedUserItemsToAdd;
           }
 
           selectedUserItemsToAdd.push(userItemsTreeNodes[i].id);
 
           if (userItemsTreeNodes[i].children.length > 0) {
-            selectedUserItemsToAdd.concat(
+            selectedUserItemsToAdd = selectedUserItemsToAdd.concat(
               UserProjectRoot.findSelectedItemsToAdd(
                 currentUserItemSelectedId,
                 previousUserItemSelectedId,
@@ -463,11 +501,12 @@ namespace UserProject {
             userItemsTreeNodes[i].id == previousUserItemSelectedId
           ) {
             startAdding = true;
+            stopAdding = false;
             selectedUserItemsToAdd.push(userItemsTreeNodes[i].id);
           }
 
           if (userItemsTreeNodes[i].children.length > 0) {
-            selectedUserItemsToAdd.concat(
+            selectedUserItemsToAdd = selectedUserItemsToAdd.concat(
               UserProjectRoot.findSelectedItemsToAdd(
                 currentUserItemSelectedId,
                 previousUserItemSelectedId,

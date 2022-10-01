@@ -1,20 +1,26 @@
 .userItem {
   height: 1.5rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
-.userItem .icons {
-  display: flex;
+.userItem:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
 }
 .userItem img,
 .userItem svg {
   width: 1rem;
   height: 1rem;
 }
-.userItem:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  cursor: pointer;
+.userItem .dropDownIcon {
+  filter: invert(84%) sepia(32%) saturate(0%) hue-rotate(172deg) brightness(98%) contrast(96%);
+}
+.userItem .icons {
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  width: 2rem;
+  margin-right: 0.5rem;
 }
 
 /*# sourceMappingURL=userItem.css.map */

@@ -69,12 +69,13 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
           iconColor={userItem.iconColor}
           layer={userItemTreeNodes[i].layer}
           handleUserItemClick={handleUserItemClick}
-          key={i}
+          key={userItem.id}
         />
       );
 
-      if (userItemTreeNodes[i].children.length > 0) {
-        JSXItems.concat(getUserItems(userItemTreeNodes[i].children));
+      if (userItemTreeNodes[i].children.length > 0 && userItem.isOpen) {
+        let child = getUserItems(userItemTreeNodes[i].children);
+        JSXItems = JSXItems.concat(child);
       }
     }
     return JSXItems;
@@ -82,12 +83,12 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
 
   return (
     <div
-      className="folderExplorer"
+      className="folderExplorer noselect"
       style={customStyle}
       onMouseOver={() => setIsMouseOverFolderExp(true)}
       onMouseOut={() => setIsMouseOverFolderExp(false)}
     >
-      <div className="title noselect">
+      <div className="title">
         <div
           className="accountName"
           onMouseOver={() => setIsMouseOverAccName(true)}

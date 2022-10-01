@@ -24,7 +24,7 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
   );
 
   const [newItemName, setNewItemName] = React.useState("");
-  const [newItemColor, setNewItemColor] = React.useState("#000000");
+  const [newItemColor, setNewItemColor] = React.useState("#447EAB");
 
   function handleOnClickSidebar(sidebar: "left" | "right") {
     if (sidebar == "left") {

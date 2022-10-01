@@ -102,12 +102,12 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
   }
 
   function getUserItemStyle() {
-    let userItemStyle = {};
+    let userItemStyle = { backgroundColor: "", border: "", color: "" };
 
     if (isSelected) {
       userItemStyle = {
-        backgroundColor: "rgba(255, 255, 255, 0.15)",
-        border: "none",
+        backgroundColor: "#1d2b3a",
+        border: "1px solid #45f3ff",
         color: "inherit",
       };
     } else {
@@ -117,21 +117,24 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
         color: "inherit",
       };
     }
-
-    if (isActive) {
-      userItemStyle = {
-        backgroundColor: "#1d2b3a88",
-        border: "1px solid #45f3ff",
-        color: "white",
-      };
-    } else {
-      userItemStyle = {
-        backgroundColor: "rgba(255, 255, 255, 0.15)",
-        border: "none",
-        color: "inherit",
-      };
-    }
     return userItemStyle;
+  }
+
+  function getIconsStyle() {
+    let iconsStyle = { marginLeft: `${0.5 * (layer - 1)}rem` };
+    return iconsStyle;
+  }
+
+  function getDropDownIconStyle() {
+    let dropDownIconStyle = {};
+
+    if (isOpen) {
+      dropDownIconStyle = { transform: "none" };
+    } else {
+      dropDownIconStyle = { transform: "rotate(-90deg)" };
+    }
+
+    return dropDownIconStyle;
   }
 
   return (
@@ -150,13 +153,13 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
       }}
       style={getUserItemStyle()}
     >
-      <div className="icons">
+      <div className="icons" style={getIconsStyle()}>
         {itemType.includes("Folder") ? (
           <div className="dropDownIcon">
             <img
               src="./svgs/arrow.svg"
-              style={{ transform: "rotate(-90deg)" }}
-              alt="Closed"
+              style={getDropDownIconStyle()}
+              alt="Folder"
             />
           </div>
         ) : (
