@@ -193,7 +193,10 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
           <li
             className="download"
             onClick={() => {
-              if (UserProject.UserItem.SelectedUserItemIdList)
+              if (
+                UserProject.UserItem.SelectedUserItemIdList &&
+                userProjectRoot.userItemsTree.ids.length > 0
+              )
                 handleDownloadFile();
             }}
           >
@@ -202,7 +205,10 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
           <li
             className="rename"
             onClick={() => {
-              if (UserProject.UserItem.SelectedUserItemIdList) {
+              if (
+                UserProject.UserItem.SelectedUserItemIdList &&
+                userProjectRoot.userItemsTree.ids.length > 0
+              ) {
                 handleFolderExplorerButtonClick("rename");
               }
             }}
@@ -220,7 +226,10 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
           <li
             className="delete"
             onClick={() => {
-              if (UserProject.UserItem.SelectedUserItemIdList)
+              if (
+                UserProject.UserItem.SelectedUserItemIdList &&
+                userProjectRoot.userItemsTree.ids.length > 0
+              )
                 handleFolderExplorerButtonClick("delete");
             }}
           >

@@ -6,8 +6,9 @@
   min-width: 19.5rem;
   width: fit-content;
   padding-right: 0.5rem;
+  transition: 0.1s;
   &:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.05) !important;
     cursor: pointer;
   }
   img,

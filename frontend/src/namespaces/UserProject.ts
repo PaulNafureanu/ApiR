@@ -41,7 +41,7 @@ namespace UserProject {
       isVisible: boolean = false
     ) {
       UserItem.IdCount += 1;
-      if (getGeneralType(itemType) == "File") {
+      if (getGeneralType(itemType) === "File") {
         UserItem.activeFileId = UserItem.IdCount;
       }
       this.id = UserItem.IdCount;
@@ -58,7 +58,7 @@ namespace UserProject {
 
     static removeSelectedUserItemId(itemId: number) {
       for (let i = 0; i < UserItem.SelectedUserItemIdList.length; i++) {
-        if (UserItem.SelectedUserItemIdList[i] == itemId) {
+        if (UserItem.SelectedUserItemIdList[i] === itemId) {
           UserItem.SelectedUserItemIdList.splice(i, 1);
           break;
         }
@@ -78,7 +78,7 @@ namespace UserProject {
 
     static getItemReferenceById(id: number): UserItem {
       for (let i = 0; i < UserItem.UserItemReferenceIdList.length; i++) {
-        if (UserItem.UserItemReferenceIdList[i].itemId == id) {
+        if (UserItem.UserItemReferenceIdList[i].itemId === id) {
           return UserItem.UserItemReferenceIdList[i].itemReference;
         }
       }
@@ -87,14 +87,14 @@ namespace UserProject {
 
     static cleanItemReferenceById(id: number) {
       for (let i = 0; i < UserItem.UserItemReferenceIdList.length; i++) {
-        if (UserItem.UserItemReferenceIdList[i].itemId == id) {
+        if (UserItem.UserItemReferenceIdList[i].itemId === id) {
           UserItem.UserItemReferenceIdList.splice(i, 1);
           break;
         }
       }
 
       for (let i = 0; i < UserItem.SelectedUserItemIdList.length; i++) {
-        if (UserItem.SelectedUserItemIdList[i] == id) {
+        if (UserItem.SelectedUserItemIdList[i] === id) {
           UserItem.SelectedUserItemIdList.splice(i, 1);
           break;
         }
@@ -135,10 +135,14 @@ namespace UserProject {
     children: TreeNode[];
   }
 
-  export type NodeOperation = "AddNode" | "RemoveNode" | "FindNode";
+  export type NodeOperation =
+    | "AddNode"
+    | "RemoveNode"
+    | "FindNode"
+    | "MoveNode";
 
   export function isTreeNode(value: TreeNode | boolean): value is TreeNode {
-    if (typeof value == "boolean") {
+    if (typeof value === "boolean") {
       return false;
     } else {
       return true;
@@ -157,12 +161,17 @@ namespace UserProject {
       treeNodes: TreeNode[],
       nodeIdToFind: number,
       operation: NodeOperation,
-      childNodeId: number = 0
+      childNodeId: number = 0,
+      nodeToBeMoved: TreeNode = { id: 0, parentId: 0, layer: 0, children: [] }
     ): boolean | TreeNode {
-      for (let i = 0; i < treeNodes.length; i++) {
-        if (treeNodes[i].id == nodeIdToFind) {
+      let len = treeNodes.length;
+      for (let i = 0; i < len; i++) {
+        if (treeNodes[i].id === nodeIdToFind) {
           switch (operation) {
             case "AddNode": {
+              let userItemParent = UserItem.getItemReferenceById(nodeIdToFind);
+              userItemParent.isOpen = true;
+              userItemParent.itemType = "OpenFolder";
               treeNodes[i].children.push({
                 id: childNodeId,
                 parentId: nodeIdToFind,
@@ -177,6 +186,18 @@ namespace UserProject {
             }
             case "FindNode": {
               return treeNodes[i];
+            }
+            case "MoveNode": {
+              let userItemParent = UserItem.getItemReferenceById(nodeIdToFind);
+              userItemParent.isOpen = true;
+              userItemParent.itemType = "OpenFolder";
+              treeNodes[i].children.push({
+                id: nodeToBeMoved.id,
+                parentId: nodeIdToFind,
+                layer: treeNodes[i].layer + 1,
+                children: nodeToBeMoved.children,
+              });
+              return true;
             }
             default: {
               return false;
@@ -198,8 +219,54 @@ namespace UserProject {
       return false;
     }
 
+    moveNode(nodeIdToBeMoved: number, nodeIdTarget: number) {
+      let nodeToBeMoved: TreeNode | boolean = {
+        id: 0,
+        parentId: 0,
+        layer: 0,
+        children: [],
+      };
+
+      console.log("move node before asssign: ", nodeToBeMoved);
+
+      Object.assign(
+        nodeToBeMoved,
+        this.findNode(this.root, nodeIdToBeMoved, "FindNode")
+      );
+
+      console.log("move node after asssign: ", nodeToBeMoved);
+
+      if (!UserProject.isTreeNode(nodeToBeMoved))
+        nodeToBeMoved = { id: 0, parentId: 0, layer: 0, children: [] };
+
+      console.log(
+        "Before removing (move node): ",
+        this.ids.includes(nodeIdToBeMoved),
+        nodeIdToBeMoved,
+        UserItem.getItemReferenceById(nodeIdToBeMoved).itemName
+      );
+
+      console.log(
+        "Find User Item in Root (move node)",
+        this.findNode(this.root, nodeIdToBeMoved, "FindNode"),
+        "root: ",
+        this.root
+      );
+
+      this.removeNode(nodeIdToBeMoved);
+      if (nodeIdTarget !== 0)
+        this.findNode(this.root, nodeIdTarget, "MoveNode", 0, nodeToBeMoved);
+      else
+        this.root.push({
+          id: nodeToBeMoved.id,
+          parentId: nodeIdTarget,
+          layer: 1,
+          children: nodeToBeMoved.children,
+        });
+    }
+
     addNode(parentId: number, childId: number) {
-      if (parentId == 0) {
+      if (parentId === 0) {
         this.root.push({ id: childId, parentId: 0, layer: 1, children: [] });
         this.ids.push(childId);
       } else {
@@ -208,7 +275,13 @@ namespace UserProject {
             this.ids.push(childId);
           } else {
             console.error(
-              "AddNode Method of Tree Class::Fatal Logic Error for Find Node Method"
+              "AddNode Method of Tree Class::Fatal Logic Error for Find Node Method",
+              "root: ",
+              this.root,
+              "parent: ",
+              parentId,
+              "child: ",
+              childId
             );
           }
         } else {
@@ -222,15 +295,20 @@ namespace UserProject {
     removeNode(nodeId: number) {
       if (this.ids.includes(nodeId)) {
         if (this.findNode(this.root, nodeId, "RemoveNode")) {
-          for (let i = 0; i < this.ids.length; i++) {
-            if (this.ids[i] == nodeId) {
+          let len = this.ids.length;
+          for (let i = 0; i < len; i++) {
+            if (this.ids[i] === nodeId) {
               this.ids.splice(i, 1);
               break;
             }
           }
         } else {
           console.error(
-            "RemoveNode Method of Tree Class::Fatal Logic Error for Find Node Method"
+            "RemoveNode Method of Tree Class::Fatal Logic Error for Find Node Method",
+            "root: ",
+            this.root,
+            "node ",
+            nodeId
           );
         }
       } else {
@@ -284,19 +362,59 @@ namespace UserProject {
     }
 
     private addUserItem(userItem: UserItem) {
-      if (this.activeWorkFolderId == 0) {
+      if (this.activeWorkFolderId === 0) {
         this.userItemsTree.addNode(0, userItem.id);
       } else {
         this.userItemsTree.addNode(this.activeWorkFolderId, userItem.id);
       }
     }
 
-    private removeUserItem(userItemId: number) {
-      if (userItemId == UserItem.activeFileId) UserItem.activeFileId = 0;
-      if (userItemId == this.activeWorkFolderId) this.activeWorkFolderId = 0;
+    private removeUserItem(
+      userItemId: number,
+      validParentId: number
+    ): number[] {
+      let removedItemIds: number[] = [];
+      let userItem = UserItem.getItemReferenceById(userItemId);
+      if (!UserItem.SelectedUserItemIdList.includes(userItemId)) {
+        this.moveUserItemNode(userItem, validParentId); //moving started. is it independent from its parent?
+        return [];
+      }
+
+      let generalType = getGeneralType(userItem.itemType);
+      if (generalType == "Folder") {
+        if (userItemId === this.activeWorkFolderId) this.activeWorkFolderId = 0;
+        let userItemNode = this.findUserItemNode(userItemId);
+
+        if (getGeneralType(userItem.itemType) === "Folder") {
+          let lenChild = userItemNode.children.length;
+          for (let i = 0; i < lenChild; i++) {
+            removedItemIds = removedItemIds.concat(
+              this.removeUserItem(userItemNode.children[i].id, validParentId)
+            );
+          }
+        }
+      } else {
+        if (userItemId === UserItem.activeFileId) UserItem.activeFileId = 0;
+      }
+
+      console.log(
+        "Before removing (remove item): ",
+        this.userItemsTree.ids.includes(userItemId),
+        userItemId,
+        userItem.itemName
+      );
+      console.log(
+        "Find User Item in Root (remove item) ",
+        this.findUserItemNode(userItemId),
+        "root: ",
+        this.userItemsTree.root
+      );
 
       this.userItemsTree.removeNode(userItemId);
       UserItem.cleanItemReferenceById(userItemId);
+      removedItemIds.push(userItemId);
+
+      return removedItemIds;
     }
 
     private findUserItemNode(userItemId: number): TreeNode {
@@ -308,6 +426,26 @@ namespace UserProject {
 
       if (UserProject.isTreeNode(result)) return result;
       else return { id: 0, parentId: 0, layer: 0, children: [] };
+    }
+
+    private moveUserItemNode(userItem: UserItem, userItemTargetId: number) {
+      function changeNodesLayer(
+        userItemsTreeNodes: TreeNode[],
+        layerTarget: number
+      ) {
+        let len = userItemsTreeNodes.length;
+        for (let i = 0; i < len; i++) {
+          userItemsTreeNodes[i].layer = layerTarget + 1;
+          if (userItemsTreeNodes[i].children.length > 0) {
+            changeNodesLayer(userItemsTreeNodes[i].children, layerTarget + 1);
+          }
+        }
+      }
+      this.userItemsTree.moveNode(userItem.id, userItemTargetId);
+      if (getGeneralType(userItem.itemType) === "Folder") {
+        let nodeMoved = this.findUserItemNode(userItem.id);
+        changeNodesLayer(nodeMoved.children, nodeMoved.layer);
+      }
     }
 
     /**User Project Methods for creating, modifying and deleting files and folders created by the user*/
@@ -325,10 +463,10 @@ namespace UserProject {
         newUserProjectRoot.userItemsTree.root,
         true
       );
-      // newUserProjectRoot.userItemsTree.root =
-      console.log(
-        newUserProjectRoot.sortUserItems(newUserProjectRoot.userItemsTree.root)
-      ); //returns undefined;
+
+      newUserProjectRoot.userItemsTree.root = newUserProjectRoot.sortUserItems(
+        newUserProjectRoot.userItemsTree.root
+      );
     }
 
     static createFile(
@@ -384,6 +522,8 @@ namespace UserProject {
       userItem.itemName = itemName;
       userItem.iconColor = iconColor;
 
+      UserProjectRoot.cleanUpBeforeReturn(newUserProjectRoot);
+
       return newUserProjectRoot;
     }
 
@@ -394,12 +534,30 @@ namespace UserProject {
 
       let len = UserItem.SelectedUserItemIdList.length;
       let selectedItems: number[] = [];
+      let removedItems: number[] = [];
       Object.assign(selectedItems, UserItem.SelectedUserItemIdList);
+
+      function getValidParentIdNode(id: number, selItems: number[]): number {
+        let parentItemNodeId = newUserProjectRoot.findUserItemNode(id).parentId;
+        if (parentItemNodeId === 0) return 0;
+        if (selItems.includes(parentItemNodeId)) {
+          return getValidParentIdNode(parentItemNodeId, selItems);
+        } else {
+          return parentItemNodeId;
+        }
+      }
 
       if (len > 0) {
         for (let i = 0; i < len; i++) {
           let itemId = selectedItems[i];
-          newUserProjectRoot.removeUserItem(itemId);
+          if (removedItems.includes(itemId)) {
+            continue;
+          }
+
+          let validParentId = getValidParentIdNode(itemId, selectedItems);
+          removedItems = removedItems.concat(
+            newUserProjectRoot.removeUserItem(itemId, validParentId) //change that getValidParent to be called only by needed items
+          );
         }
 
         UserItem.SelectedUserItemIdList = [];
@@ -415,6 +573,13 @@ namespace UserProject {
       );
 
       UserProjectRoot.cleanUpBeforeReturn(newUserProjectRoot);
+      console.log(newUserProjectRoot);
+      console.log(
+        UserItem.SelectedUserItemIdList,
+        UserItem.UserItemReferenceIdList,
+        UserItem.IdCount,
+        UserItem.activeFileId
+      );
       return newUserProjectRoot;
     }
 
@@ -428,11 +593,13 @@ namespace UserProject {
 
       for (let i = 0; i < len; i++) {
         let userItem = UserItem.getItemReferenceById(ids[i]);
-        if (getGeneralType(userItem.itemType) == "Folder") {
+        if (getGeneralType(userItem.itemType) === "Folder") {
           userItem.isOpen = false;
           userItem.itemType = "ClosedFolder";
         }
       }
+
+      newUserProjectRoot.activeWorkFolderId = 0;
 
       UserProjectRoot.cleanUpBeforeReturn(newUserProjectRoot);
       return newUserProjectRoot;
@@ -485,7 +652,7 @@ namespace UserProject {
       let isDuplicated = false;
       for (let i = 0; i < size; i++) {
         let userItem = UserItem.getItemReferenceById(ids[i]);
-        if (userItem.itemName == fileName && userItem.itemType == itemType) {
+        if (userItem.itemName === fileName && userItem.itemType === itemType) {
           isDuplicated = true;
           break;
         }
@@ -524,6 +691,10 @@ namespace UserProject {
         currentUserProjectRoot
       );
 
+      newUserProjectRoot.userItemsTree.root = newUserProjectRoot.sortUserItems(
+        newUserProjectRoot.userItemsTree.root
+      );
+
       let userItem = UserProject.UserItem.getItemReferenceById(itemId);
       let generalType = getGeneralType(userItem.itemType);
 
@@ -531,12 +702,12 @@ namespace UserProject {
         if (UserFile.SelectedUserItemIdList.includes(itemId)) {
           UserItem.removeSelectedUserItemId(itemId);
           let generalType = getGeneralType(userItem.itemType);
-          if (generalType == "Folder")
+          if (generalType === "Folder")
             newUserProjectRoot.deselectAllItemsFromFolder(itemId);
         } else {
           UserItem.addSelectedUserItemId(itemId);
           let generalType = getGeneralType(userItem.itemType);
-          if (generalType == "Folder")
+          if (generalType === "Folder")
             newUserProjectRoot.selectAllItemsFromFolder(itemId);
         }
       } else {
@@ -547,23 +718,7 @@ namespace UserProject {
             ];
           let currentUserItemSelectedId = itemId;
 
-          //TODO: add also to the selection the files included in end folders
-          // let userItem = UserItem.getItemReferenceById(
-          //   currentUserItemSelectedId
-          // );
-          // let generalType = getGeneralType(userItem.itemType);
-          // if (generalType == "Folder") {
-          //   let currentUserItemTreeNode = newUserProjectRoot.findUserItem(
-          //     currentUserItemSelectedId
-          //   );
-          //   let len = currentUserItemTreeNode.children.length;
-          //   if (currentUserItemTreeNode.id != 0 && len > 0) {
-          //     currentUserItemSelectedId =
-          //       currentUserItemTreeNode.children[len - 1].id;
-          //   }
-          // }
-
-          if (currentUserItemSelectedId != previousUserItemSelectedId) {
+          if (currentUserItemSelectedId !== previousUserItemSelectedId) {
             let rootNodes = newUserProjectRoot.userItemsTree.root;
 
             let selectedUserItemsToAdd: number[] =
@@ -573,7 +728,7 @@ namespace UserProject {
                 rootNodes,
                 false,
                 false
-              );
+              ).selectedArr;
 
             for (let i = 0; i < selectedUserItemsToAdd.length; i++) {
               if (
@@ -589,18 +744,19 @@ namespace UserProject {
           }
         } else {
           UserItem.SelectedUserItemIdList = [];
-          UserItem.SelectedUserItemIdList.push(itemId);
           let userItemNode = newUserProjectRoot.findUserItemNode(itemId);
 
-          if (generalType == "File") {
+          if (generalType === "File") {
+            UserItem.SelectedUserItemIdList.push(itemId);
             UserItem.activeFileId = itemId;
             userItem.isOpen = true;
-            if (userItemNode.layer == 1)
+            if (userItemNode.layer === 1)
               newUserProjectRoot.activeWorkFolderId = 0;
             if (userItemNode.layer > 1)
               newUserProjectRoot.activeWorkFolderId = userItemNode.parentId;
           } else {
             newUserProjectRoot.selectAllItemsFromFolder(itemId);
+            UserItem.SelectedUserItemIdList.push(itemId);
             userItem.isOpen = !userItem.isOpen;
             if (userItem.isOpen) userItem.itemType = "OpenFolder";
             else userItem.itemType = "ClosedFolder";
@@ -609,7 +765,11 @@ namespace UserProject {
         }
       }
 
-      UserProjectRoot.cleanUpBeforeReturn(newUserProjectRoot);
+      newUserProjectRoot.setVisibleItems(
+        newUserProjectRoot.userItemsTree.root,
+        true
+      );
+
       return newUserProjectRoot;
     }
 
@@ -653,18 +813,20 @@ namespace UserProject {
           children: [],
         };
 
-        for (let i = 0; i < arr.length - 1; i++) {
-          let min = arr[i];
-          for (let j = i + 1; j < arr.length; j++) {
-            let arrJName = UserItem.getItemReferenceById(arr[j].id).itemName;
-            let minName = UserItem.getItemReferenceById(arr[i].id).itemName;
-            if (arrJName < minName) {
-              Object.assign(aux, arr[j]);
-              Object.assign(arr[j], min);
-              Object.assign(min, aux);
+        if (arr.length > 1) {
+          for (let i = 0; i < arr.length - 1; i++) {
+            let min = arr[i];
+            for (let j = i + 1; j < arr.length; j++) {
+              let arrJName = UserItem.getItemReferenceById(arr[j].id).itemName;
+              let minName = UserItem.getItemReferenceById(arr[i].id).itemName;
+              if (arrJName < minName) {
+                Object.assign(aux, arr[j]);
+                Object.assign(arr[j], min);
+                Object.assign(min, aux);
+              }
             }
+            sortedArray.push(min);
           }
-          sortedArray.push(min);
         }
         sortedArray.push(arr[arr.length - 1]);
         return sortedArray;
@@ -672,15 +834,14 @@ namespace UserProject {
 
       let sortedUserFilesTreeNodes: TreeNode[] = [];
       let auxUserFilesTreeNodes: TreeNode[] = [];
-      let sortedUserFoldersTreNodes: TreeNode[] = [];
-      let auxUserFoldersTreNodes: TreeNode[] = [];
+      let sortedUserFoldersTreeNodes: TreeNode[] = [];
+      let auxUserFoldersTreeNodes: TreeNode[] = [];
 
       for (let i = 0; i < userItemsTreeNodes.length; i++) {
-        if (
-          userItemsTreeNodes[i].children &&
-          userItemsTreeNodes[i].children.length > 0
-        ) {
-          auxUserFoldersTreNodes.push(userItemsTreeNodes[i]);
+        let userItem = UserItem.getItemReferenceById(userItemsTreeNodes[i].id);
+        let generalType = getGeneralType(userItem.itemType);
+        if (generalType === "Folder") {
+          auxUserFoldersTreeNodes.push(userItemsTreeNodes[i]);
           userItemsTreeNodes[i].children = this.sortUserItems(
             userItemsTreeNodes[i].children
           );
@@ -690,9 +851,26 @@ namespace UserProject {
       }
 
       sortedUserFilesTreeNodes = sortArray(auxUserFilesTreeNodes);
-      sortedUserFoldersTreNodes = sortArray(auxUserFoldersTreNodes);
+      sortedUserFoldersTreeNodes = sortArray(auxUserFoldersTreeNodes);
 
-      return sortedUserFoldersTreNodes.concat(sortedUserFilesTreeNodes);
+      let sortedUserItemsTreeNodes: TreeNode[];
+
+      if (sortedUserFilesTreeNodes[0] === undefined) {
+        if (sortedUserFoldersTreeNodes[0] === undefined) {
+          sortedUserItemsTreeNodes = [];
+        } else {
+          sortedUserItemsTreeNodes = sortedUserFoldersTreeNodes;
+        }
+      } else {
+        if (sortedUserFoldersTreeNodes[0] === undefined) {
+          sortedUserItemsTreeNodes = sortedUserFilesTreeNodes;
+        } else {
+          sortedUserItemsTreeNodes = sortedUserFoldersTreeNodes.concat(
+            sortedUserFilesTreeNodes
+          );
+        }
+      }
+      return sortedUserItemsTreeNodes;
     }
 
     private selectAllItemsFromFolder(folderId: number) {
@@ -705,7 +883,8 @@ namespace UserProject {
           if (!UserItem.SelectedUserItemIdList.includes(childId)) {
             UserItem.SelectedUserItemIdList.push(userItemNode.children[i].id);
             let generalType = getGeneralType(userItem.itemType);
-            if (generalType == "Folder") this.selectAllItemsFromFolder(childId);
+            if (generalType === "Folder")
+              this.selectAllItemsFromFolder(childId);
           }
         }
       }
@@ -721,11 +900,28 @@ namespace UserProject {
           if (UserItem.SelectedUserItemIdList.includes(childId)) {
             UserItem.removeSelectedUserItemId(userItemNode.children[i].id);
             let generalType = getGeneralType(userItem.itemType);
-            if (generalType == "Folder")
+            if (generalType === "Folder")
               this.deselectAllItemsFromFolder(childId);
           }
         }
       }
+    }
+
+    static getAllItemIdsFromFolder(folderNode: TreeNode): number[] {
+      let folderItemIds: number[] = [];
+      if (folderNode.children && folderNode.children.length > 0) {
+        let len = folderNode.children.length;
+        for (let i = 0; i < len; i++) {
+          let childNode = folderNode.children[i];
+          folderItemIds.push(childNode.id);
+          if (childNode.children.length > 0) {
+            folderItemIds.concat(
+              UserProjectRoot.getAllItemIdsFromFolder(childNode)
+            );
+          }
+        }
+      }
+      return folderItemIds;
     }
 
     static findSelectedItemsToAdd(
@@ -734,43 +930,68 @@ namespace UserProject {
       userItemsTreeNodes: TreeNode[],
       startAdding: boolean,
       stopAdding: boolean
-    ): number[] {
+    ): { selectedArr: number[]; start: boolean; stop: boolean } {
       if (stopAdding) {
-        return [];
+        return {
+          selectedArr: [],
+          start: startAdding,
+          stop: stopAdding,
+        };
       }
       let selectedUserItemsToAdd: number[] = [];
       for (let i = 0; i < userItemsTreeNodes.length; i++) {
         if (stopAdding) {
-          return selectedUserItemsToAdd;
+          return {
+            selectedArr: selectedUserItemsToAdd,
+            start: startAdding,
+            stop: stopAdding,
+          };
         }
         if (startAdding) {
           if (
-            userItemsTreeNodes[i].id == currentUserItemSelectedId ||
-            userItemsTreeNodes[i].id == previousUserItemSelectedId
+            userItemsTreeNodes[i].id === currentUserItemSelectedId ||
+            userItemsTreeNodes[i].id === previousUserItemSelectedId
           ) {
             selectedUserItemsToAdd.push(userItemsTreeNodes[i].id);
+
+            if (userItemsTreeNodes[i].children.length > 0) {
+              let result = UserProjectRoot.getAllItemIdsFromFolder(
+                userItemsTreeNodes[i]
+              );
+
+              selectedUserItemsToAdd = selectedUserItemsToAdd.concat(result);
+            }
+
             stopAdding = true;
             startAdding = false;
-            return selectedUserItemsToAdd;
+            return {
+              selectedArr: selectedUserItemsToAdd,
+              start: startAdding,
+              stop: stopAdding,
+            };
           }
 
           selectedUserItemsToAdd.push(userItemsTreeNodes[i].id);
 
           if (userItemsTreeNodes[i].children.length > 0) {
-            selectedUserItemsToAdd = selectedUserItemsToAdd.concat(
-              UserProjectRoot.findSelectedItemsToAdd(
-                currentUserItemSelectedId,
-                previousUserItemSelectedId,
-                userItemsTreeNodes[i].children,
-                startAdding,
-                stopAdding
-              )
+            let resultFromFind = UserProjectRoot.findSelectedItemsToAdd(
+              currentUserItemSelectedId,
+              previousUserItemSelectedId,
+              userItemsTreeNodes[i].children,
+              startAdding,
+              stopAdding
             );
+            selectedUserItemsToAdd = selectedUserItemsToAdd.concat(
+              resultFromFind.selectedArr
+            );
+
+            startAdding = resultFromFind.start;
+            stopAdding = resultFromFind.stop;
           }
         } else {
           if (
-            userItemsTreeNodes[i].id == currentUserItemSelectedId ||
-            userItemsTreeNodes[i].id == previousUserItemSelectedId
+            userItemsTreeNodes[i].id === currentUserItemSelectedId ||
+            userItemsTreeNodes[i].id === previousUserItemSelectedId
           ) {
             startAdding = true;
             stopAdding = false;
@@ -778,20 +999,27 @@ namespace UserProject {
           }
 
           if (userItemsTreeNodes[i].children.length > 0) {
-            selectedUserItemsToAdd = selectedUserItemsToAdd.concat(
-              UserProjectRoot.findSelectedItemsToAdd(
-                currentUserItemSelectedId,
-                previousUserItemSelectedId,
-                userItemsTreeNodes[i].children,
-                startAdding,
-                stopAdding
-              )
+            let resultFromFind = UserProjectRoot.findSelectedItemsToAdd(
+              currentUserItemSelectedId,
+              previousUserItemSelectedId,
+              userItemsTreeNodes[i].children,
+              startAdding,
+              stopAdding
             );
+            selectedUserItemsToAdd = selectedUserItemsToAdd.concat(
+              resultFromFind.selectedArr
+            );
+
+            startAdding = resultFromFind.start;
+            stopAdding = resultFromFind.stop;
           }
         }
       }
-
-      return selectedUserItemsToAdd;
+      return {
+        selectedArr: selectedUserItemsToAdd,
+        start: startAdding,
+        stop: stopAdding,
+      };
     }
   }
 }
