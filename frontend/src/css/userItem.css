@@ -1,7 +1,11 @@
 .userItem {
+  z-index: 1;
   height: 1.5rem;
   display: flex;
   align-items: center;
+  min-width: 19.5rem;
+  width: fit-content;
+  padding-right: 0.5rem;
 }
 .userItem:hover {
   background-color: rgba(255, 255, 255, 0.05);
@@ -14,6 +18,10 @@
 }
 .userItem .dropDownIcon {
   filter: invert(84%) sepia(32%) saturate(0%) hue-rotate(172deg) brightness(98%) contrast(96%);
+}
+.userItem .itemName {
+  overflow: visible;
+  white-space: nowrap;
 }
 .userItem .icons {
   display: flex;

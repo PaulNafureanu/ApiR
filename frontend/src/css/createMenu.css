@@ -16,11 +16,32 @@
 .createMenu .headerMenu {
   background-color: #0a0f14;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   font-size: 0.9rem;
   height: 1.5rem;
   color: #ddd;
+  padding: 0 1rem;
+}
+.createMenu .headerMenu .header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.createMenu .headerMenu .exit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1.6rem;
+  height: 100%;
+  cursor: pointer;
+  color: rgba(136, 136, 136, 0.5333333333);
+  transition: 0.1s;
+}
+.createMenu .headerMenu .exit:hover {
+  background-color: rgba(255, 0, 0, 0.5333333333);
+  color: white;
 }
 .createMenu .bodyMenu {
   display: flex;

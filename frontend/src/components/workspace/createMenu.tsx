@@ -5,24 +5,26 @@ import "./../../css/utils.css";
 
 interface CreateMenuProps {
   isCreateMenuOpen: string;
-  handleSubmit: () => void;
+  handleCreateMenuClick: () => void;
   newItemName: string;
   handleInputNameChange: (value: string) => void;
   newItemColor: string;
   handleInputColorChange: (value: string) => void;
+  handleCreateMenuExit: () => void;
 }
 
 const CreateMenu: React.FunctionComponent<CreateMenuProps> = ({
   isCreateMenuOpen,
-  handleSubmit,
+  handleCreateMenuClick,
   newItemName,
   newItemColor,
   handleInputNameChange,
   handleInputColorChange,
+  handleCreateMenuExit,
 }) => {
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    handleSubmit();
+    handleCreateMenuClick();
   }
 
   function getCreateMenuStyle() {
@@ -64,6 +66,9 @@ const CreateMenu: React.FunctionComponent<CreateMenuProps> = ({
         break;
       }
       case "delete": {
+        CreateMenuText.header =
+          "Are you sure you want to delete the selected files?";
+        CreateMenuText.submitButtonValue = "Delete permanently";
         break;
       }
       default: {
@@ -73,26 +78,55 @@ const CreateMenu: React.FunctionComponent<CreateMenuProps> = ({
 
     return CreateMenuText;
   }
+
+  function getFormMenu() {
+    let menu, okButtonStyle;
+    if (isCreateMenuOpen == "delete") {
+      menu = <button onClick={handleCreateMenuExit}>Don't delete</button>;
+      okButtonStyle = { width: "12rem" };
+    } else {
+      okButtonStyle = { width: "8.5rem" };
+      menu = (
+        <React.Fragment>
+          <InputField
+            value={newItemName}
+            handleInputChange={(value) => handleInputNameChange(value)}
+            spanValue={getCreateMenuText().inputSpanValue}
+          />
+          <div className="iconColor">
+            <input
+              type={"color"}
+              value={newItemColor}
+              onChange={(event) => {
+                handleInputColorChange(event.target.value);
+              }}
+            ></input>
+          </div>
+        </React.Fragment>
+      );
+    }
+
+    let formMenu = (
+      <form className="bodyMenu" onSubmit={handleFormSubmit}>
+        {menu}
+        <button style={okButtonStyle}>
+          {getCreateMenuText().submitButtonValue}
+        </button>
+      </form>
+    );
+
+    return formMenu;
+  }
+
   return (
     <div className="createMenu noselect" style={getCreateMenuStyle()}>
-      <div className="headerMenu">{getCreateMenuText().header}</div>
-      <form className="bodyMenu" onSubmit={handleFormSubmit}>
-        <InputField
-          value={newItemName}
-          handleInputChange={(value) => handleInputNameChange(value)}
-          spanValue={getCreateMenuText().inputSpanValue}
-        />
-        <div className="iconColor">
-          <input
-            type={"color"}
-            value={newItemColor}
-            onChange={(event) => {
-              handleInputColorChange(event.target.value);
-            }}
-          ></input>
+      <div className="headerMenu">
+        <div className="header">{getCreateMenuText().header}</div>
+        <div className="exit" onClick={handleCreateMenuExit}>
+          X
         </div>
-        <button>{getCreateMenuText().submitButtonValue}</button>
-      </form>
+      </div>
+      {getFormMenu()}
     </div>
   );
 };

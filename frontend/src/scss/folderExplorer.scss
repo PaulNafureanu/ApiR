@@ -3,12 +3,15 @@
   color: #bbb;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid #fff1;
+  border-top: none;
+  border-bottom: none;
   box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.2),
     3.3px 3.3px 5.3px rgba(0, 0, 0, 0.028),
     11.2px 11.2px 17.9px rgba(0, 0, 0, 0.042),
     50px 50px 80px rgba(0, 0, 0, 0.07);
   transition: 0.2s;
+  overflow: hidden;
   .title {
     height: 1.5rem;
     display: flex;
@@ -66,6 +69,9 @@
         height: 1rem;
         width: 1rem;
       }
+      &:active {
+        border: 1px solid black;
+      }
       &:hover {
         background-color: rgba(119, 119, 119, 0.5);
         border-radius: 0.2rem;
@@ -79,7 +85,7 @@
     }
 
     .uploadFile,
-    .uploadFolder {
+    .download {
       filter: invert(8%) sepia(100%) saturate(7487%) hue-rotate(247deg)
         brightness(100%) contrast(144%);
     }
@@ -88,6 +94,9 @@
       img {
         height: 0.9rem;
         width: 0.9rem;
+      }
+      .inputFile {
+        display: none;
       }
     }
 
@@ -102,6 +111,18 @@
     .refresh {
       filter: invert(90%) sepia(99%) saturate(4573%) hue-rotate(360deg)
         brightness(108%) contrast(104%);
+    }
+
+    li img {
+      transition: 0.5s;
+    }
+
+    li:active img {
+      transform: rotate(180deg);
+    }
+
+    .refresh:active img {
+      transform: rotate(360deg);
     }
 
     .delete {
@@ -120,12 +141,51 @@
   }
   .files {
     box-sizing: content-box;
-    // border: 1px solid blue;
-    height: 1rem;
+    overflow: auto;
+    height: 90%;
+    width: 99%;
     padding: 0.2rem;
     ul {
       display: flex;
       flex-direction: column;
+      border-left: 3px dotted rgba(255, 255, 255, 0.05);
+      border-right: 3px dotted rgba(255, 255, 255, 0.05);
     }
+
+    /* width */
+    &::-webkit-scrollbar {
+      width: 0.5rem;
+      height: 0.5rem;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+      background: #22222244;
+      border: 1px solid #fff2;
+      border-radius: 0.6rem;
+      margin: 1rem;
+    }
+    &::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+      background: #54545488;
+      border-radius: 0.6rem;
+    }
+  }
+  .freeSpace {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    min-height: 6rem;
+  }
+
+  .dropFiles {
+    height: 2rem;
+    font-size: 2rem;
+    margin-bottom: 2rem;
   }
 }

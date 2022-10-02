@@ -1,7 +1,11 @@
 .userItem {
+  z-index: 1;
   height: 1.5rem;
   display: flex;
   align-items: center;
+  min-width: 19.5rem;
+  width: fit-content;
+  padding-right: 0.5rem;
   &:hover {
     background-color: rgba(255, 255, 255, 0.05);
     cursor: pointer;
@@ -17,13 +21,16 @@
       brightness(98%) contrast(96%);
   }
 
+  .itemName {
+    overflow: visible;
+    white-space: nowrap;
+  }
+
   .icons {
     display: flex;
     align-items: center;
     justify-content: right;
     width: 2rem;
     margin-right: 0.5rem;
-  }
-  .itemName {
   }
 }

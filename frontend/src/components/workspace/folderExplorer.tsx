@@ -7,22 +7,47 @@ import "./../../css/utils.css";
 interface FolderExplorerProps {
   customStyle: any;
   userProjectRoot: UserProject.UserProjectRoot;
-  handleClick: (value: UserProject.MethodsSupported) => void;
   handleUserItemClick: (
     id: number,
     isCtrlPressed: boolean,
     isShiftPressed: boolean
   ) => void;
+  handleUploadFile: (file: File) => void;
+  handleDownloadFile: () => void;
+  handleFolderExplorerButtonClick: (
+    button: UserProject.MethodsSupported
+  ) => void;
+  handleFreeSpaceClick: () => void;
 }
 
 const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
   customStyle,
   userProjectRoot,
-  handleClick,
   handleUserItemClick,
+  handleUploadFile,
+  handleDownloadFile,
+  handleFolderExplorerButtonClick,
+  handleFreeSpaceClick,
 }) => {
   const [isMouseOverAccName, setIsMouseOverAccName] = React.useState(false);
   const [isMouseOverFolderExp, setIsMouseOverFolderExp] = React.useState(false);
+  const inputFileRef = React.createRef<HTMLInputElement>();
+
+  function getFreeSpaceStyle() {
+    let freeSpaceStyle;
+    let count = userProjectRoot.countVisibleItems();
+    freeSpaceStyle = {
+      height: `calc(99% - ${1.5 * count}rem)`,
+      borderBottom: "3px dotted rgba(255,255,255,0.05)",
+      borderLeft: "3px dotted rgba(255,255,255,0.05)",
+      borderRight: "3px dotted rgba(255,255,255,0.05)",
+      borderBottomLeftRadius: "1rem",
+      borderBottomRightRadius: "1rem",
+      color: "rgba(255,255,255,0.05)",
+    };
+
+    return freeSpaceStyle;
+  }
 
   function FolderExplorerStyle() {
     let FolderExplorerStyle = { AccountNameStyle: {}, ButtonStyle: {} };
@@ -81,6 +106,43 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
     return JSXItems;
   }
 
+  function handleUploadFileClick() {
+    let inputElement: HTMLInputElement;
+    if (inputFileRef.current != null) inputElement = inputFileRef.current;
+    else return;
+
+    inputElement.click();
+    inputElement.addEventListener("change", () => {
+      let files: FileList;
+      if (inputElement.files != null) files = inputElement.files;
+      else {
+        return;
+      }
+      for (let i = 0; i < files.length; i++) {
+        handleUploadFile(files[i]);
+      }
+    });
+  }
+
+  function handleUploadFileDrop(e: React.DragEvent<HTMLDivElement>) {
+    let inputElement: HTMLInputElement;
+    if (inputFileRef.current != null) inputElement = inputFileRef.current;
+    else return;
+
+    inputElement.files = e.dataTransfer.files;
+
+    let files: FileList;
+    if (inputElement.files != null) files = inputElement.files;
+    else {
+      return;
+    }
+    for (let i = 0; i < files.length; i++) {
+      handleUploadFile(files[i]);
+    }
+
+    e.preventDefault();
+  }
+
   return (
     <div
       className="folderExplorer noselect"
@@ -105,7 +167,7 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
           <li
             className="createFile"
             onClick={() => {
-              handleClick("createFile");
+              handleFolderExplorerButtonClick("createFile");
             }}
           >
             <img src="./svgs/addFile.svg" alt="Create New File" />
@@ -113,31 +175,36 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
           <li
             className="createFolder"
             onClick={() => {
-              handleClick("createFolder");
+              handleFolderExplorerButtonClick("createFolder");
             }}
           >
             <img src="./svgs/addFolder.svg" alt="Create New Folder" />
           </li>
-          <li
-            className="uploadFile"
-            onClick={() => {
-              handleClick("uploadFile");
-            }}
-          >
+          <li className="uploadFile" onClick={handleUploadFileClick}>
+            <input
+              ref={inputFileRef}
+              type={"file"}
+              multiple
+              className="inputFile"
+              accept=".doc, .docx, .txt, .pdf"
+            />
             <img src="./svgs/uploadFile.svg" alt="Uplaod New File" />
           </li>
           <li
-            className="uploadFolder"
+            className="download"
             onClick={() => {
-              handleClick("uploadFolder");
+              if (UserProject.UserItem.SelectedUserItemIdList)
+                handleDownloadFile();
             }}
           >
-            <img src="./svgs/uploadFolder.svg" alt="Upload New Folder" />
+            <img src="./svgs/download.svg" alt="Download" />
           </li>
           <li
             className="rename"
             onClick={() => {
-              handleClick("rename");
+              if (UserProject.UserItem.SelectedUserItemIdList) {
+                handleFolderExplorerButtonClick("rename");
+              }
             }}
           >
             <img src="./svgs/rename.svg" alt="Rename" />
@@ -145,7 +212,7 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
           <li
             className="refresh"
             onClick={() => {
-              handleClick("refresh");
+              handleFolderExplorerButtonClick("refresh");
             }}
           >
             <img src="./svgs/refresh.svg" alt="Refresh Project" />
@@ -153,7 +220,8 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
           <li
             className="delete"
             onClick={() => {
-              handleClick("delete");
+              if (UserProject.UserItem.SelectedUserItemIdList)
+                handleFolderExplorerButtonClick("delete");
             }}
           >
             <img src="./svgs/delete.svg" alt="Delete" />
@@ -161,7 +229,7 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
           <li
             className="collapseFolders"
             onClick={() => {
-              handleClick("collapseFolders");
+              handleFolderExplorerButtonClick("collapse");
             }}
           >
             <img src="./svgs/collapseFolders.svg" alt="Collapse Folders" />
@@ -170,6 +238,20 @@ const FolderExplorer: React.FunctionComponent<FolderExplorerProps> = ({
       </div>
       <div className="files">
         <ul>{getUserItems(userProjectRoot.userItemsTree.root)}</ul>
+        <div
+          className="freeSpace"
+          onClick={handleFreeSpaceClick}
+          style={getFreeSpaceStyle()}
+          onDrop={handleUploadFileDrop}
+          onDragOver={(e) => {
+            e.preventDefault();
+          }}
+          onDragEnter={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <p className="dropFiles">Drop Files Here</p>
+        </div>
       </div>
     </div>
   );

@@ -18,11 +18,32 @@
   .headerMenu {
     background-color: #0a0f14;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     font-size: 0.9rem;
     height: 1.5rem;
     color: #ddd;
+    padding: 0 1rem;
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+    .exit {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 1.6rem;
+      height: 100%;
+      cursor: pointer;
+      color: #8888;
+      transition: 0.1s;
+      &:hover {
+        background-color: #f008;
+        color: white;
+      }
+    }
   }
 
   .bodyMenu {

@@ -16,9 +16,9 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
   const [isRightSidebarOpen, setIsRightSidebarOpen] = React.useState(false);
   const [isCreateMenuOpen, setIsCreateMenuOpen] = React.useState("none");
   const [currentOperation, setCurrentOperation]: [
-    UserProject.MethodsSupported,
-    React.Dispatch<React.SetStateAction<UserProject.MethodsSupported>>
-  ] = React.useState(UserProject.castString("createFile"));
+    UserProject.ModifierMethodsSupported,
+    React.Dispatch<React.SetStateAction<UserProject.ModifierMethodsSupported>>
+  ] = React.useState(UserProject.castToMofierMethod("createFile"));
   const [userProjectRoot, setUserProjectRoot] = React.useState(
     new UserProject.UserProjectRoot("Leo")
   );
@@ -34,19 +34,14 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
     }
   }
 
-  function handleClickFolderExplorer(value: UserProject.MethodsSupported) {
-    setCurrentOperation(value);
-    let createValues = ["createFile", "createFolder", "rename", "delete"];
-    if (createValues.includes(value)) {
-      setIsCreateMenuOpen(value);
-    } else {
-      let newUserProjectRoot = UserProject.UserProjectRoot[value](
-        userProjectRoot,
-        newItemName,
-        newItemColor
-      );
-      setUserProjectRoot(newUserProjectRoot);
+  window.addEventListener("keydown", (e) => {
+    if (e.key == "Escape") {
+      handleCreateMenuExit();
     }
+  });
+
+  function handleCreateMenuExit() {
+    setIsCreateMenuOpen("none");
   }
 
   function handleUserItemClick(
@@ -60,6 +55,37 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
       isCtrlPressed,
       isShiftPressed
     );
+    setUserProjectRoot(newUserProjectRoot);
+  }
+
+  function handleUploadFile(file: File) {
+    let newUserProjectRoot = UserProject.UserProjectRoot.handleUploadFile(
+      userProjectRoot,
+      file
+    );
+    setUserProjectRoot(newUserProjectRoot);
+  }
+
+  function handleDownloadFile() {
+    console.log("download started from workspace");
+  }
+
+  function handleFolderExplorerButtonClick(
+    button: UserProject.MethodsSupported
+  ) {
+    if (UserProject.isAModifierMethod(button)) {
+      setCurrentOperation(button);
+      setIsCreateMenuOpen(button);
+    } else {
+      let newUserProjectRoot =
+        UserProject.UserProjectRoot[button](userProjectRoot);
+      setUserProjectRoot(newUserProjectRoot);
+    }
+  }
+
+  function handleFreeSpaceClick() {
+    let newUserProjectRoot =
+      UserProject.UserProjectRoot.handleFreeSpaceClick(userProjectRoot);
     setUserProjectRoot(newUserProjectRoot);
   }
 
@@ -105,10 +131,11 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
           <FolderExplorer
             customStyle={getCustomUserSpaceStyle().FolderExplorerStyle}
             userProjectRoot={userProjectRoot}
-            handleClick={(value) => handleClickFolderExplorer(value)}
-            handleUserItemClick={(id, isCtrlPressed, isShiftPressed) =>
-              handleUserItemClick(id, isCtrlPressed, isShiftPressed)
-            }
+            handleUserItemClick={handleUserItemClick}
+            handleUploadFile={handleUploadFile}
+            handleDownloadFile={handleDownloadFile}
+            handleFolderExplorerButtonClick={handleFolderExplorerButtonClick}
+            handleFreeSpaceClick={handleFreeSpaceClick}
           />
         </div>
         <FileViewer />
@@ -117,7 +144,7 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
         />
         <CreateMenu
           isCreateMenuOpen={isCreateMenuOpen}
-          handleSubmit={() => {
+          handleCreateMenuClick={() => {
             let newUserProjectRoot = UserProject.UserProjectRoot[
               currentOperation
             ](userProjectRoot, newItemName, newItemColor);
@@ -126,6 +153,7 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
           }}
           newItemName={newItemName}
           newItemColor={newItemColor}
+          handleCreateMenuExit={handleCreateMenuExit}
           handleInputNameChange={(value) => setNewItemName(value)}
           handleInputColorChange={(value) => setNewItemColor(value)}
         />
