@@ -24,7 +24,7 @@ export class Tree {
     if (rootCopy.id === targetId) {
       rootCopy.children.push({
         id: id,
-        parentId: targetId,
+        parentId: rootCopy.id,
         layer: rootCopy.layer + 1,
         children: [],
       });
@@ -112,7 +112,7 @@ export class Tree {
     const len = rootCopy.children.length;
     if (len) {
       for (let i = 0; i < len; i++) {
-        let result = this._cleanUpIds(
+        let result = Tree._cleanUpIds(
           id,
           rootCopy.children[i],
           idListCopy,
@@ -127,8 +127,104 @@ export class Tree {
     return idListCopy;
   }
 
-  private static _moveNode(id: string, targetId: string): TreeNode | false {}
-  // getNode(id: string): TreeNode {}
+  private static _getNode(id: string, root: TreeNode): TreeNode | false {
+    const rootCopy: TreeNode = structuredClone(root);
+
+    if (rootCopy.id === id) {
+      const nodeFound: TreeNode = structuredClone(rootCopy);
+      return nodeFound;
+    } else {
+      const len = rootCopy.children.length;
+      if (len) {
+        for (let i = 0; i < len; i++) {
+          const result = Tree._getNode(id, rootCopy.children[i]);
+          if (result) {
+            return result;
+          }
+        }
+      }
+      return false;
+    }
+  }
+
+  private static _addNode(
+    node: TreeNode,
+    targetId: string,
+    tree: Tree
+  ): Tree | false {
+    const treeCopy: Tree = structuredClone(tree);
+    const nodeCopy: TreeNode = structuredClone(node);
+
+    const newRoot = addParentNode(treeCopy._root);
+    if (newRoot) {
+      treeCopy._root = newRoot;
+      return treeCopy;
+    } else {
+      return false;
+    }
+
+    function setChildrenLayer(parentNode: TreeNode): TreeNode | false {
+      const parentNodeCopy: TreeNode = structuredClone(parentNode);
+      const len = parentNodeCopy.children.length;
+      if (len) {
+        const children: TreeNode[] = structuredClone(parentNode.children);
+        let result;
+        for (let i = 0; i < len; i++) {
+          children[i].layer = parentNodeCopy.layer + 1;
+          result = setChildrenLayer(children[i]);
+          if (result) {
+            children[i] = result;
+          } else {
+            return false;
+          }
+        }
+        parentNodeCopy.children = children;
+      }
+      return parentNodeCopy;
+    }
+
+    function addParentNode(root: TreeNode): TreeNode | false {
+      const rootCopy: TreeNode = structuredClone(root);
+      if (rootCopy.id === targetId) {
+        const children: TreeNode[] = structuredClone(node.children);
+        rootCopy.children.push({
+          id: nodeCopy.id,
+          parentId: rootCopy.id,
+          layer: rootCopy.layer + 1,
+          children: children,
+        });
+        nodeCopy.layer = rootCopy.layer + 1;
+        const result = setChildrenLayer(nodeCopy);
+        if (result) {
+          rootCopy.children[rootCopy.children.length - 1] = result;
+        } else {
+          return false;
+        }
+
+        return rootCopy;
+      } else {
+        const len = rootCopy.children.length;
+        if (len) {
+          let result;
+          for (let i = 0; i < len; i++) {
+            result = addParentNode(rootCopy.children[i]);
+            if (result) {
+              rootCopy.children[i] = result;
+              break;
+            }
+          }
+          if (result) {
+            return rootCopy;
+          } else {
+            return false;
+          }
+        }
+        {
+          return false;
+        }
+      }
+    }
+  }
 
   /**Public methods */
   public static createNode(
@@ -178,7 +274,7 @@ export class Tree {
     if (newTree._idList.includes(id)) {
       const result = Tree._deleteNode(id, newTree._root);
       if (result) {
-        const newIdList = this._cleanUpIds(
+        const newIdList = Tree._cleanUpIds(
           id,
           newTree._root,
           newTree._idList,
@@ -211,7 +307,65 @@ export class Tree {
     id: string,
     targetId: string,
     tree: Tree
-  ): Tree | false {}
-}
+  ): Tree | false {
+    const treeCopy: Tree = structuredClone(tree);
+    const idListCopy: string[] = structuredClone(treeCopy._idList);
 
-//TODO
+    const resultGetNode = Tree.getNode(id, treeCopy);
+    let nodeToBeMoved: TreeNode;
+    if (resultGetNode) nodeToBeMoved = resultGetNode;
+    else return false;
+
+    const resultDeleteNode = Tree.deleteNode(id, treeCopy);
+    let treeAfterDeletion: Tree;
+    if (resultDeleteNode) {
+      if (resultDeleteNode._idList.includes(targetId)) {
+        treeAfterDeletion = resultDeleteNode;
+        const treeAfterAddNode = Tree._addNode(
+          nodeToBeMoved,
+          targetId,
+          treeAfterDeletion
+        );
+        if (treeAfterAddNode) {
+          treeAfterAddNode._idList = idListCopy;
+          return treeAfterAddNode;
+        } else {
+          console.error(
+            `Tree.createNode:: TargetID '${targetId}' was not found in the Root Tree, but was found in the Id List. 
+          The Id List and Root Tree are not sync. Please check Id List and Root Tree.`
+          );
+          return false;
+        }
+      } else {
+        console.error(
+          `Tree.createNode:: TargetID '${id}' was not found in the Id List. Provide a valid parent id or check Id List.`
+        );
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  public static getNode(id: string, tree: Tree): TreeNode | false {
+    const newTree: Tree = structuredClone(tree);
+
+    if (newTree._idList.includes(id)) {
+      const result = Tree._getNode(id, newTree._root);
+      if (result) {
+        return result;
+      } else {
+        console.error(
+          `Tree.deleteNode:: TargetID '${id}' was not found in the Root Tree, but was found in the Id List. 
+          The Id List and Root Tree are not sync. Please check Id List and Root Tree.`
+        );
+        return false;
+      }
+    } else {
+      console.error(
+        `Tree.deleteNode:: TargetID '${id}' was not found in the Id List. Provide a valid id or check Id List.`
+      );
+      return false;
+    }
+  }
+}

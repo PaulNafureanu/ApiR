@@ -13,28 +13,6 @@ function App() {
   //   console.log(e);
   // });
 
-  let tree = new Tree();
-  let result = Tree.createNode("1f", "0", tree);
-  if (result) {
-    result = Tree.createNode("2f", "0", result);
-  }
-  if (result) {
-    result = Tree.createNode("3f", "2f", result);
-  }
-  if (result) {
-    result = Tree.createNode("4f", "2f", result);
-  }
-
-  if (result) {
-    result = Tree.deleteNode("2f", result);
-  }
-
-  if (result) {
-    result = Tree.deleteNode("3f", result);
-  }
-
-  console.log(result);
-
   return (
     <div className="App">
       {/* <Start /> */}
