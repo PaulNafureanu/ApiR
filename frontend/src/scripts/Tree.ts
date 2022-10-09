@@ -1,3 +1,6 @@
+import structuredClone from "@ungap/structured-clone";
+import { copyFile } from "fs";
+
 export interface TreeNode {
   id: string;
   parentId: string;
@@ -6,8 +9,9 @@ export interface TreeNode {
 }
 
 export class Tree {
-  private _root: TreeNode;
-  private _idList: string[];
+  /**Private properties */
+  _root: TreeNode;
+  _idList: string[];
 
   constructor() {
     this._root = { id: "0", parentId: "0", layer: 0, children: [] };
@@ -53,30 +57,33 @@ export class Tree {
   }
 
   private static _deleteNode(id: string, root: TreeNode): TreeNode | false {
+    if (id === "0") {
+      return false;
+    }
+
     const rootCopy: TreeNode = structuredClone(root);
-    if (rootCopy.id === id && id !== "0") {
-      return rootCopy;
-    } else {
-      const len = rootCopy.children.length;
-      if (len) {
-        let result;
-        for (let i = 0; i < len; i++) {
-          result = Tree._deleteNode(id, rootCopy.children[i]);
-          if (result) {
-            rootCopy.children.splice(i, 1);
-            break;
-          }
-        }
-        if (result) {
+    const children = rootCopy.children;
+    const len = children.length;
+
+    if (len) {
+      let result;
+      for (let i = 0; i < len; i++) {
+        if (children[i].id === id) {
+          children.splice(i, 1);
+          rootCopy.children = children;
           return rootCopy;
-        } else {
-          return false;
         }
-      }
-      {
-        return false;
+
+        result = Tree._deleteNode(id, children[i]);
+        if (result) {
+          children[i] = structuredClone(result);
+          rootCopy.children[i] = children[i];
+          return rootCopy;
+        }
       }
     }
+
+    return false;
   }
 
   private static _cleanUpIds(
@@ -186,18 +193,20 @@ export class Tree {
     function addParentNode(root: TreeNode): TreeNode | false {
       const rootCopy: TreeNode = structuredClone(root);
       if (rootCopy.id === targetId) {
-        const children: TreeNode[] = structuredClone(node.children);
+        const children: TreeNode[] = structuredClone(nodeCopy.children);
         rootCopy.children.push({
           id: nodeCopy.id,
           parentId: rootCopy.id,
           layer: rootCopy.layer + 1,
           children: children,
         });
-        nodeCopy.layer = rootCopy.layer + 1;
-        const result = setChildrenLayer(nodeCopy);
+        const len = rootCopy.children.length;
+        const nodeAdded = rootCopy.children[len - 1];
+        const result = setChildrenLayer(nodeAdded);
         if (result) {
-          rootCopy.children[rootCopy.children.length - 1] = result;
+          rootCopy.children[len - 1] = result;
         } else {
+          console.error("Tree.moveNode:: node push to the stack error.");
           return false;
         }
 
@@ -331,14 +340,14 @@ export class Tree {
           return treeAfterAddNode;
         } else {
           console.error(
-            `Tree.createNode:: TargetID '${targetId}' was not found in the Root Tree, but was found in the Id List. 
+            `Tree.moveNode:: TargetID '${targetId}' was not found in the Root Tree, but was found in the Id List. 
           The Id List and Root Tree are not sync. Please check Id List and Root Tree.`
           );
           return false;
         }
       } else {
         console.error(
-          `Tree.createNode:: TargetID '${id}' was not found in the Id List. Provide a valid parent id or check Id List.`
+          `Tree.moveNode:: TargetID '${id}' was not found in the Id List. Provide a valid parent id or check Id List.`
         );
         return false;
       }
