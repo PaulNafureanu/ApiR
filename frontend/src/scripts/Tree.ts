@@ -1,5 +1,4 @@
 import structuredClone from "@ungap/structured-clone";
-import { copyFile } from "fs";
 
 export interface TreeNode {
   id: string;
@@ -10,12 +9,17 @@ export interface TreeNode {
 
 export class Tree {
   /**Private properties */
-  _root: TreeNode;
-  _idList: string[];
+  private _root: TreeNode;
+  private _idList: string[];
 
   constructor() {
     this._root = { id: "0", parentId: "0", layer: 0, children: [] };
     this._idList = ["0"];
+  }
+
+  /** Accessors */
+  public get root() {
+    return this._root;
   }
 
   /** Private methods */

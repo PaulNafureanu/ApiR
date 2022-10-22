@@ -1,20 +1,21 @@
 import * as React from "react";
+import { MethodsSupported } from "../../scripts/UserProject";
 import InputField from "../start/inputField";
 import "./../../css/createMenu.css";
 import "./../../css/utils.css";
 
 interface CreateMenuProps {
-  isCreateMenuOpen: string;
-  handleCreateMenuClick: () => void;
-  newItemName: string;
-  handleInputNameChange: (value: string) => void;
+  createMenuState: MethodsSupported;
   newItemColor: string;
+  newItemName: string;
+  handleCreateMenuClick: () => void;
+  handleInputNameChange: (value: string) => void;
   handleInputColorChange: (value: string) => void;
   handleCreateMenuExit: () => void;
 }
 
 const CreateMenu: React.FunctionComponent<CreateMenuProps> = ({
-  isCreateMenuOpen,
+  createMenuState,
   handleCreateMenuClick,
   newItemName,
   newItemColor,
@@ -29,7 +30,7 @@ const CreateMenu: React.FunctionComponent<CreateMenuProps> = ({
 
   function getCreateMenuStyle() {
     let createMenuStyle;
-    if (isCreateMenuOpen == "none") {
+    if (createMenuState == "none") {
       createMenuStyle = { display: "none" };
     } else {
       createMenuStyle = { display: "flex" };
@@ -45,27 +46,27 @@ const CreateMenu: React.FunctionComponent<CreateMenuProps> = ({
       submitButtonValue: "",
     };
 
-    switch (isCreateMenuOpen) {
-      case "createFile": {
+    switch (createMenuState) {
+      case "handleCreateFile": {
         CreateMenuText.header = "Choose the icon color and name your new file";
         CreateMenuText.inputSpanValue = "Type File Name Here";
         CreateMenuText.submitButtonValue = "Create File";
         break;
       }
-      case "createFolder": {
+      case "handleCreateFolder": {
         CreateMenuText.header =
           "Choose the icon color and name your new folder";
         CreateMenuText.inputSpanValue = "Type Folder Name Here";
         CreateMenuText.submitButtonValue = "Create Folder";
         break;
       }
-      case "rename": {
+      case "handleRename": {
         CreateMenuText.header = "Rename and choose a new icon color";
         CreateMenuText.inputSpanValue = "Type The New Name Here";
         CreateMenuText.submitButtonValue = "Rename";
         break;
       }
-      case "delete": {
+      case "handleDelete": {
         CreateMenuText.header =
           "Are you sure you want to delete the selected files?";
         CreateMenuText.submitButtonValue = "Delete permanently";
@@ -81,7 +82,7 @@ const CreateMenu: React.FunctionComponent<CreateMenuProps> = ({
 
   function getFormMenu() {
     let menu, okButtonStyle;
-    if (isCreateMenuOpen == "delete") {
+    if (createMenuState == "handleDelete") {
       menu = <button onClick={handleCreateMenuExit}>Don't delete</button>;
       okButtonStyle = { width: "12rem" };
     } else {

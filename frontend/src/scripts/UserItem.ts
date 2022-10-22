@@ -44,8 +44,8 @@ export class UserFile extends UserItem {
     name: string,
     fileFormat: fileFormat,
     iconColor: string,
-    isVisibleInFileExplorer: boolean,
-    isOpenInFileViewer: boolean
+    isVisibleInFileExplorer: boolean = true,
+    isOpenInFileViewer: boolean = true
   ) {
     super(id, "file", name, iconColor, isVisibleInFileExplorer);
     this.fileFormat = fileFormat;
@@ -62,8 +62,8 @@ export class UserFolder extends UserItem {
     name: string,
     folderFormat: folderFormat,
     iconColor: string,
-    isVisibleInFileExplorer: boolean,
-    isOpenInFileExplorer: boolean
+    isVisibleInFileExplorer: boolean = true,
+    isOpenInFileExplorer: boolean = false
   ) {
     super(id, "folder", name, iconColor, isVisibleInFileExplorer);
     this.folderFormat = folderFormat;

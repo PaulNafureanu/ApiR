@@ -1,30 +1,56 @@
 import * as React from "react";
-import UserProject from "../../namespaces/UserProject";
+import UserProject, {
+  castToMethodOptions,
+  castToMofierMethod,
+  isAModifierMethod,
+  MethodOptions,
+  MethodsSupported,
+  ModifierMethodsSupported,
+} from "../../scripts/UserProject";
 import Menu from "./menu";
 import ProjectMenu from "./projectMenu";
-import FolderExplorer from "./folderExplorer";
+import FileExplorer from "./fileExplorer";
 import FileViewer from "./fileViewer";
 import RightSidebar from "./rightSidebar";
 import CreateMenu from "./createMenu";
 import "./../../css/workspace.css";
 import "./../../css/utils.css";
+import structuredClone from "@ungap/structured-clone";
 
 interface WorkSpaceProps {}
 
 const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
+  /**States */
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = React.useState(true);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = React.useState(false);
-  const [isCreateMenuOpen, setIsCreateMenuOpen] = React.useState("none");
-  const [currentOperation, setCurrentOperation]: [
-    UserProject.ModifierMethodsSupported,
-    React.Dispatch<React.SetStateAction<UserProject.ModifierMethodsSupported>>
-  ] = React.useState(UserProject.castToMofierMethod("createFile"));
-  const [userProjectRoot, setUserProjectRoot] = React.useState(
-    new UserProject.UserProjectRoot("Leo")
+  const [userProject, setUserProject] = React.useState(new UserProject("Leo"));
+
+  const [methodOptions, setMethodOptions]: [
+    MethodOptions,
+    React.Dispatch<React.SetStateAction<MethodOptions>>
+  ] = React.useState(
+    castToMethodOptions({
+      method: "none",
+      name: "",
+      iconColor: "#447EAB",
+      id: "",
+      isCtrlPressed: false,
+      isShiftPressed: false,
+      file: undefined,
+    })
   );
 
-  const [newItemName, setNewItemName] = React.useState("");
-  const [newItemColor, setNewItemColor] = React.useState("#447EAB");
+  /**Listeners */
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key == "Escape") {
+      const optionCopy: MethodOptions = structuredClone(methodOptions);
+      optionCopy.method = "none";
+      setMethodOptions(optionCopy);
+    }
+  });
+
+  /**Handlers */
 
   function handleOnClickSidebar(sidebar: "left" | "right") {
     if (sidebar == "left") {
@@ -34,74 +60,28 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
     }
   }
 
-  window.addEventListener("keydown", (e) => {
-    if (e.key == "Escape") {
-      handleCreateMenuExit();
+  function handleFileExplorerButtonClick(options: MethodOptions) {
+    if (!isAModifierMethod(options.method)) {
+      let newUserProject = UserProject[options.method](userProject, options);
+      if (newUserProject) setUserProject(newUserProject);
     }
-  });
-
-  function handleCreateMenuExit() {
-    setIsCreateMenuOpen("none");
+    setMethodOptions(options);
   }
 
-  function handleUserItemClick(
-    itemId: number,
-    isCtrlPressed: boolean,
-    isShiftPressed: boolean
-  ) {
-    let newUserProjectRoot = UserProject.UserProjectRoot.handleUserItemClick(
-      userProjectRoot,
-      itemId,
-      isCtrlPressed,
-      isShiftPressed
-    );
-    setUserProjectRoot(newUserProjectRoot);
-  }
-
-  function handleUploadFile(file: File) {
-    let newUserProjectRoot = UserProject.UserProjectRoot.handleUploadFile(
-      userProjectRoot,
-      file
-    );
-    setUserProjectRoot(newUserProjectRoot);
-  }
-
-  function handleDownloadFile() {
-    console.log("download started from workspace");
-  }
-
-  function handleFolderExplorerButtonClick(
-    button: UserProject.MethodsSupported
-  ) {
-    if (UserProject.isAModifierMethod(button)) {
-      setCurrentOperation(button);
-      setIsCreateMenuOpen(button);
-    } else {
-      let newUserProjectRoot =
-        UserProject.UserProjectRoot[button](userProjectRoot);
-      setUserProjectRoot(newUserProjectRoot);
-    }
-  }
-
-  function handleFreeSpaceClick() {
-    let newUserProjectRoot =
-      UserProject.UserProjectRoot.handleFreeSpaceClick(userProjectRoot);
-    setUserProjectRoot(newUserProjectRoot);
-  }
-
+  /**Renders */
   function getCustomUserSpaceStyle() {
     let CustomeUserSpaceStyle = {
       ProjectExplorerStyle: {},
-      FolderExplorerStyle: {},
+      FileExplorerStyle: {},
       RightSidebarStyle: {},
     };
 
     if (isLeftSidebarOpen) {
       CustomeUserSpaceStyle.ProjectExplorerStyle = { width: "24rem" };
-      CustomeUserSpaceStyle.FolderExplorerStyle = { display: "block" };
+      CustomeUserSpaceStyle.FileExplorerStyle = { display: "block" };
     } else {
       CustomeUserSpaceStyle.ProjectExplorerStyle = { width: "3rem" };
-      CustomeUserSpaceStyle.FolderExplorerStyle = { display: "none" };
+      CustomeUserSpaceStyle.FileExplorerStyle = { display: "none" };
     }
 
     if (isRightSidebarOpen) {
@@ -111,6 +91,42 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
     }
 
     return CustomeUserSpaceStyle;
+  }
+
+  function renderCreateMenu() {
+    if (!isAModifierMethod(methodOptions.method)) return;
+    return (
+      <CreateMenu
+        createMenuState={methodOptions.method}
+        handleCreateMenuClick={() => {
+          let newUserProject = UserProject[methodOptions.method](
+            userProject,
+            methodOptions
+          );
+          const optionCopy: MethodOptions = structuredClone(methodOptions);
+          optionCopy.method = "none";
+          setMethodOptions(optionCopy);
+          if (newUserProject) setUserProject(newUserProject);
+        }}
+        newItemName={methodOptions.name}
+        newItemColor={methodOptions.iconColor}
+        handleCreateMenuExit={() => {
+          const optionCopy: MethodOptions = structuredClone(methodOptions);
+          optionCopy.method = "none";
+          setMethodOptions(optionCopy);
+        }}
+        handleInputNameChange={(value) => {
+          const optionCopy: MethodOptions = structuredClone(methodOptions);
+          optionCopy.name = value;
+          setMethodOptions(optionCopy);
+        }}
+        handleInputColorChange={(value) => {
+          const optionCopy: MethodOptions = structuredClone(methodOptions);
+          optionCopy.iconColor = value;
+          setMethodOptions(optionCopy);
+        }}
+      />
+    );
   }
 
   return (
@@ -128,35 +144,18 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
           style={getCustomUserSpaceStyle().ProjectExplorerStyle}
         >
           <ProjectMenu />
-          <FolderExplorer
-            customStyle={getCustomUserSpaceStyle().FolderExplorerStyle}
-            userProjectRoot={userProjectRoot}
-            handleUserItemClick={handleUserItemClick}
-            handleUploadFile={handleUploadFile}
-            handleDownloadFile={handleDownloadFile}
-            handleFolderExplorerButtonClick={handleFolderExplorerButtonClick}
-            handleFreeSpaceClick={handleFreeSpaceClick}
+          <FileExplorer
+            customStyle={getCustomUserSpaceStyle().FileExplorerStyle}
+            userProject={userProject}
+            methodOptions={methodOptions}
+            handleFileExplorerButtonClick={handleFileExplorerButtonClick}
           />
         </div>
         <FileViewer />
         <RightSidebar
           customStyle={getCustomUserSpaceStyle().RightSidebarStyle}
         />
-        <CreateMenu
-          isCreateMenuOpen={isCreateMenuOpen}
-          handleCreateMenuClick={() => {
-            let newUserProjectRoot = UserProject.UserProjectRoot[
-              currentOperation
-            ](userProjectRoot, newItemName, newItemColor);
-            setIsCreateMenuOpen("none");
-            setUserProjectRoot(newUserProjectRoot);
-          }}
-          newItemName={newItemName}
-          newItemColor={newItemColor}
-          handleCreateMenuExit={handleCreateMenuExit}
-          handleInputNameChange={(value) => setNewItemName(value)}
-          handleInputColorChange={(value) => setNewItemColor(value)}
-        />
+        {renderCreateMenu()}
       </div>
     </div>
   );
