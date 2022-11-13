@@ -44,8 +44,7 @@ const FileExplorer: React.FunctionComponent<FileExplorerProps> = ({
 
   function getFreeSpaceStyle() {
     let freeSpaceStyle;
-    // let count = userProject.countVisibleItems();
-    let count = 20;
+    let count = userProject.countVisibleItems();
     freeSpaceStyle = {
       height: `calc(99% - ${1.5 * count}rem)`,
       borderBottom: "3px dotted rgba(255,255,255,0.05)",
@@ -156,9 +155,9 @@ const FileExplorer: React.FunctionComponent<FileExplorerProps> = ({
 
   function getUserItems(userItemTreeNodes: TreeNode[]): JSX.Element[] {
     let JSXItems: JSX.Element[] = [];
-    for (let i = 0; i < userItemTreeNodes.length; i++) {
+    const len = userItemTreeNodes.length;
+    for (let i = 0; i < len; i++) {
       let userItem = userProject.getItemReferenceById(userItemTreeNodes[i].id);
-
       if (userItem) {
         let isItemSelected = userProject.selectedUserItemIdList.includes(
           userItemTreeNodes[i].id
@@ -198,9 +197,9 @@ const FileExplorer: React.FunctionComponent<FileExplorerProps> = ({
             key={userItem.id}
           />
         );
-        const len = userItemTreeNodes[i].children.length;
+        const childLen = userItemTreeNodes[i].children.length;
 
-        if (len && isOpen) {
+        if (childLen && isOpen) {
           let child = getUserItems(userItemTreeNodes[i].children);
           JSXItems = JSXItems.concat(child);
         }
@@ -221,12 +220,11 @@ const FileExplorer: React.FunctionComponent<FileExplorerProps> = ({
       else {
         return;
       }
-      for (let i = 0; i < files.length; i++) {
-        const optionCopy: MethodOptions = structuredClone(methodOptions);
-        optionCopy.method = "handleUpload";
-        optionCopy.file = files[i];
-        handleFileExplorerButtonClick(optionCopy);
-      }
+
+      const optionCopy: MethodOptions = structuredClone(methodOptions);
+      optionCopy.method = "handleUpload";
+      optionCopy.files = files;
+      handleFileExplorerButtonClick(optionCopy);
     });
   }
 
@@ -242,13 +240,10 @@ const FileExplorer: React.FunctionComponent<FileExplorerProps> = ({
     else {
       return;
     }
-    for (let i = 0; i < files.length; i++) {
-      const optionCopy: MethodOptions = structuredClone(methodOptions);
-      optionCopy.method = "handleUpload";
-      optionCopy.file = files[i];
-      handleFileExplorerButtonClick(optionCopy);
-    }
-
+    const optionCopy: MethodOptions = structuredClone(methodOptions);
+    optionCopy.method = "handleUpload";
+    optionCopy.files = files;
+    handleFileExplorerButtonClick(optionCopy);
     e.preventDefault();
   }
 

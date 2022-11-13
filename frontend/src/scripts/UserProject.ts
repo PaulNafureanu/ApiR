@@ -1,4 +1,5 @@
-import { Tree, TreeNode } from "./Tree";
+import structuredClone from "@ungap/structured-clone";
+import { getTreeNodeClone, Tree, TreeNode } from "./Tree";
 import {
   UserFile,
   UserFolder,
@@ -14,7 +15,8 @@ export interface MethodOptions {
   id?: string;
   isCtrlPressed?: boolean;
   isShiftPressed?: boolean;
-  file?: File | undefined;
+  files?: FileList;
+  fileFormat?: fileFormat;
 }
 
 class UserProject {
@@ -41,6 +43,26 @@ class UserProject {
   }
 
   /** Accessors */
+  public getUserProjectClone(): UserProject {
+    let newUserProject = new UserProject(this._accountName);
+    newUserProject._activeWorkingFileId = this._activeWorkingFileId;
+    newUserProject._activeWorkingFolderId = this._activeWorkingFolderId;
+    newUserProject._selectedUserItemIdList = [...this._selectedUserItemIdList];
+    newUserProject._userItemIdList = [...this._userItemIdList];
+    let len = this._userFileList.length;
+    for (let i = 0; i < len; i++) {
+      newUserProject._userFileList.push(this._userFileList[i].getFileClone());
+    }
+
+    len = this._userFolderList.length;
+    for (let i = 0; i < len; i++) {
+      newUserProject._userFolderList.push(
+        this._userFolderList[i].getFolderClone()
+      );
+    }
+    newUserProject._userTree = this._userTree.getTreeClone();
+    return newUserProject;
+  }
   public get accountName() {
     return this._accountName;
   }
@@ -57,8 +79,110 @@ class UserProject {
     return this._selectedUserItemIdList;
   }
 
-  /**Instance methods */
+  /***Instance methods */
+
   /**Private instance methods */
+  private _sortUsertItems(userItemsTreeNodes: TreeNode[]): TreeNode[] {
+    function sortArray(
+      currentUserProject: UserProject,
+      arr: TreeNode[]
+    ): TreeNode[] {
+      let sortedArray: TreeNode[] = [];
+      let aux: TreeNode = {
+        id: "0",
+        parentId: "0",
+        layer: 0,
+        children: [],
+      };
+      const len = arr.length;
+      if (len > 1) {
+        for (let i = 0; i < len - 1; i++) {
+          let min = arr[i];
+          for (let j = i + 1; j < len; j++) {
+            let arrJname = currentUserProject.getItemReferenceById(arr[j].id);
+            let minName = currentUserProject.getItemReferenceById(arr[i].id);
+
+            if (minName && arrJname) {
+              if (arrJname.name < minName.name) {
+                aux = getTreeNodeClone(aux, arr[j]);
+                arr[j] = getTreeNodeClone(arr[j], min);
+                min = getTreeNodeClone(min, aux);
+              }
+            }
+          }
+          sortedArray.push(min);
+        }
+      }
+      sortedArray.push(arr[len - 1]);
+      return sortedArray;
+    }
+
+    let sortedUserFilesTreeNodes: TreeNode[] = [];
+    let auxUserFilesTreeNodes: TreeNode[] = [];
+    let sortedUserFoldersTreeNodes: TreeNode[] = [];
+    let auxUserFoldersTreeNodes: TreeNode[] = [];
+
+    const len = userItemsTreeNodes.length;
+
+    for (let i = 0; i < len; i++) {
+      let userItem = this.getItemReferenceById(userItemsTreeNodes[i].id);
+
+      if (userItem instanceof UserFolder) {
+        auxUserFoldersTreeNodes.push(userItemsTreeNodes[i]);
+        userItemsTreeNodes[i].children = this._sortUsertItems(
+          userItemsTreeNodes[i].children
+        );
+      }
+
+      if (userItem instanceof UserFile) {
+        auxUserFilesTreeNodes.push(userItemsTreeNodes[i]);
+      }
+    }
+
+    sortedUserFilesTreeNodes = sortArray(this, auxUserFilesTreeNodes);
+    sortedUserFoldersTreeNodes = sortArray(this, auxUserFoldersTreeNodes);
+
+    let sortedUserItemsTreeNodes: TreeNode[];
+
+    if (sortedUserFilesTreeNodes[0] === undefined) {
+      if (sortedUserFoldersTreeNodes[0] === undefined) {
+        sortedUserItemsTreeNodes = [];
+      } else {
+        sortedUserItemsTreeNodes = sortedUserFoldersTreeNodes;
+      }
+    } else {
+      if (sortedUserFoldersTreeNodes[0] === undefined) {
+        sortedUserItemsTreeNodes = sortedUserFilesTreeNodes;
+      } else {
+        sortedUserItemsTreeNodes = sortedUserFoldersTreeNodes.concat(
+          sortedUserFilesTreeNodes
+        );
+      }
+    }
+    return sortedUserItemsTreeNodes;
+  }
+
+  private _setVisibleItems(userItemsTreeNodes: TreeNode[], value: boolean) {
+    const len = userItemsTreeNodes.length;
+
+    for (let i = 0; i < len; i++) {
+      let userItem = this.getItemReferenceById(userItemsTreeNodes[i].id);
+      if (userItem) {
+        userItem.isVisibleInFileExplorer = value;
+        if (userItem instanceof UserFolder) {
+          let childLen = userItemsTreeNodes[i].children.length;
+          let isOpen = userItem.isOpenInFileExplorer;
+
+          if (childLen > 0 && isOpen) {
+            this._setVisibleItems(userItemsTreeNodes[i].children, value);
+          }
+          if (childLen > 0 && !isOpen) {
+            this._setVisibleItems(userItemsTreeNodes[i].children, false);
+          }
+        }
+      }
+    }
+  }
 
   /** Public instance methods */
   public getItemReferenceById(id: string): UserFile | UserFolder | false {
@@ -67,32 +191,80 @@ class UserProject {
 
     for (let i = 0; i < lenFileList; i++) {
       if (this._userFileList[i].id === id) {
-        return structuredClone(this._userFileList[i]);
+        const file = this._userFileList[i];
+        const fileId: number = parseInt(file.id.slice(0, -1));
+        const newFile = new UserFile(
+          fileId,
+          file.name,
+          file.fileFormat,
+          file.iconColor,
+          file.isVisibleInFileExplorer,
+          file.isOpenInFileViewer
+        );
+
+        return newFile;
       }
     }
 
     for (let i = 0; i < lenFolderList; i++) {
       if (this._userFolderList[i].id === id) {
-        return structuredClone(this._userFolderList[i]);
+        const folder = this._userFolderList[i];
+        const folderId: number = parseInt(folder.id.slice(0, -1));
+        const newFolder = new UserFolder(
+          folderId,
+          folder.name,
+          folder.folderFormat,
+          folder.iconColor,
+          folder.isVisibleInFileExplorer,
+          folder.isOpenInFileExplorer
+        );
+
+        return newFolder;
       }
     }
 
     return false;
   }
 
-  /**Static methods */
+  public countVisibleItems() {
+    let count = 0;
+    function iterateTreeNode(
+      userItemsTreeNodes: TreeNode[],
+      UserProject: UserProject
+    ) {
+      for (let i = 0; i < userItemsTreeNodes.length; i++) {
+        let userItem = UserProject.getItemReferenceById(
+          userItemsTreeNodes[i].id
+        );
+        if (userItem) {
+          if (userItem.isVisibleInFileExplorer) count++;
+          if (userItemsTreeNodes[i].children.length > 0) {
+            iterateTreeNode(userItemsTreeNodes[i].children, UserProject);
+          }
+        }
+      }
+    }
+
+    iterateTreeNode(this.userTree.root.children, this);
+    return count;
+  }
+
+  /***Static methods */
   /**Private static methods */
-  private static _getIdNumber(): number {
-    UserProject._idCount++;
-    return UserProject._idCount;
-  }
-
   private static _handleSetUp(currentUserProject: UserProject): UserProject {
-    return structuredClone(currentUserProject);
+    return currentUserProject.getUserProjectClone();
   }
-
   private static _handleCleanUp(newUserProject: UserProject): UserProject {
-    return newUserProject;
+    let userProjectClone = newUserProject.getUserProjectClone();
+    userProjectClone._userTree.root.children = userProjectClone._sortUsertItems(
+      userProjectClone._userTree.root.children
+    );
+
+    userProjectClone._setVisibleItems(
+      userProjectClone._userTree.root.children,
+      true
+    );
+    return userProjectClone;
   }
 
   /** Public static methods */
@@ -100,62 +272,193 @@ class UserProject {
     currentUserProject: UserProject,
     options: MethodOptions
   ): UserProject {
-    console.log("create file", options);
-    return currentUserProject;
-    // try {
-    //   let newUserProject = UserProject._handleSetUp(currentUserProject);
-    //   if (options.name && options.iconColor) {
-    //     let newFile = new UserFile(
-    //       UserProject._getIdNumber(),
-    //       options.name,
-    //       "app",
-    //       options.iconColor
-    //     );
+    try {
+      let newUserProject = UserProject._handleSetUp(currentUserProject);
 
-    //     newUserProject._userFileList.push(newFile);
-    //     newUserProject._userItemIdList.push(newFile.id);
-    //     newUserProject._activeWorkingFileId = newFile.id;
+      if (!options.fileFormat) {
+        options.fileFormat = "app";
+      }
 
-    //     let newUserTree = Tree.createNode(
-    //       newFile.id,
-    //       newUserProject._activeWorkingFolderId,
-    //       newUserProject._userTree
-    //     );
+      if (options.name && options.iconColor) {
+        UserProject._idCount++;
+        let newFile = new UserFile(
+          UserProject._idCount,
+          options.name,
+          options.fileFormat,
+          options.iconColor
+        );
 
-    //     if (newUserTree) {
-    //       newUserProject._userTree = newUserTree;
-    //     } else {
-    //       throw new Error(
-    //         "UserProject.handleCreateFile:: Error at creating a new node in the user tree"
-    //       );
-    //     }
+        let newUserTree = Tree.createNode(
+          newFile.id,
+          newUserProject._activeWorkingFolderId,
+          newUserProject._userTree
+        );
+        newUserProject._userFileList.push(newFile);
+        newUserProject._userItemIdList.push(newFile.id);
+        newUserProject._activeWorkingFileId = newFile.id;
+        newUserProject._selectedUserItemIdList = [];
+        newUserProject._selectedUserItemIdList.push(newFile.id);
+        if (newUserProject._activeWorkingFolderId !== "0") {
+          const len = newUserProject._userFolderList.length;
+          for (let i = 0; i < len; i++) {
+            if (
+              newUserProject._userFolderList[i].id ===
+              newUserProject._activeWorkingFolderId
+            ) {
+              newUserProject._userFolderList[i].isOpenInFileExplorer = true;
+            }
+          }
+        }
 
-    //     newUserProject = UserProject._handleCleanUp(newUserProject);
-    //     return newUserProject;
-    //   } else {
-    //     throw new Error(
-    //       "UserProject.handleCreateFile:: New name and / or new icon color not defined"
-    //     );
-    //   }
-    // } catch (err) {
-    //   console.error(err);
-    //   return currentUserProject;
-    // }
+        if (newUserTree) {
+          newUserProject._userTree = newUserTree;
+        } else {
+          throw new Error(
+            "UserProject.handleCreateFile:: Error at creating a new node in the user tree"
+          );
+        }
+
+        newUserProject = UserProject._handleCleanUp(newUserProject);
+
+        return newUserProject;
+      } else {
+        throw new Error(
+          "UserProject.handleCreateFile:: New name and / or new icon color and / or file format not defined"
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      return currentUserProject;
+    }
   }
-
   public static handleCreateFolder(
     currentUserProject: UserProject,
     options: MethodOptions
   ): UserProject {
-    console.log("create file", options);
-    return currentUserProject;
+    try {
+      let newUserProject = UserProject._handleSetUp(currentUserProject);
+      if (options.name && options.iconColor) {
+        UserProject._idCount++;
+        let newFolder = new UserFolder(
+          UserProject._idCount,
+          options.name,
+          "ClosedFolder",
+          options.iconColor
+        );
+
+        let newUserTree = Tree.createNode(
+          newFolder.id,
+          newUserProject._activeWorkingFolderId,
+          newUserProject._userTree
+        );
+
+        newUserProject._userFolderList.push(newFolder);
+        newUserProject._userItemIdList.push(newFolder.id);
+        newUserProject._activeWorkingFolderId = newFolder.id;
+        newUserProject._selectedUserItemIdList = [];
+        newUserProject._selectedUserItemIdList.push(newFolder.id);
+
+        if (newUserTree) {
+          newUserProject._userTree = newUserTree;
+        } else {
+          throw new Error(
+            "UserProject.handleCreateFolder:: Error at creating a new node in the user tree"
+          );
+        }
+
+        newUserProject = UserProject._handleCleanUp(newUserProject);
+        return newUserProject;
+      } else {
+        throw new Error(
+          "UserProject.handleCreateFolder:: New name and / or new icon color not defined"
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      return currentUserProject;
+    }
   }
   public static handleUpload(
     currentUserProject: UserProject,
     options: MethodOptions
   ): UserProject {
-    console.log("create file", options);
-    return currentUserProject;
+    try {
+      let newUserProject = UserProject._handleSetUp(currentUserProject);
+      if (options.files) {
+        const noFiles = options.files.length;
+        for (let i = 0; i < noFiles; i++) {
+          let fileName, format, fileFormat: fileFormat, iconColor;
+          let nameParts = options.files[i].name.split(".");
+          let len = nameParts.length;
+          if (len > 2) {
+            fileName = nameParts.slice(0, -1).join(".");
+          } else {
+            fileName = nameParts[0];
+          }
+          format = nameParts[len - 1];
+
+          switch (true) {
+            case ["doc"].includes(format): {
+              iconColor = "#4B8CDB";
+              fileFormat = ".doc";
+              break;
+            }
+            case ["docx"].includes(format): {
+              iconColor = "#4B8CDB";
+              fileFormat = ".docx";
+              break;
+            }
+            case ["pdf"].includes(format): {
+              iconColor = "#E2574C";
+              fileFormat = ".pdf";
+              break;
+            }
+            case ["txt"].includes(format): {
+              iconColor = "#9BC9FF";
+              fileFormat = ".txt";
+              break;
+            }
+            default: {
+              iconColor = "#447EAB";
+              fileFormat = "app";
+              break;
+            }
+          }
+
+          const lenFileList = newUserProject._userFileList.length;
+          let isDuplicated = false;
+          for (let i = 0; i < lenFileList; i++) {
+            let fileStored = newUserProject._userFileList[i];
+
+            if (
+              fileStored.fileFormat === fileFormat &&
+              fileStored.name === fileName
+            ) {
+              isDuplicated = true;
+              break;
+            }
+          }
+          if (!isDuplicated) {
+            newUserProject = UserProject.handleCreateFile(newUserProject, {
+              method: "handleCreateFile",
+              name: fileName,
+              iconColor: iconColor,
+              fileFormat: fileFormat,
+            });
+          }
+        }
+
+        newUserProject = UserProject._handleCleanUp(newUserProject);
+        return newUserProject;
+      } else {
+        throw new Error(
+          "UserProject.handleUploadFile:: Upload file not defined"
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      return currentUserProject;
+    }
   }
   public static handleDownload(
     currentUserProject: UserProject,
@@ -175,14 +478,56 @@ class UserProject {
     currentUserProject: UserProject,
     options: MethodOptions
   ): UserProject {
-    console.log("create file", options);
-    return currentUserProject;
+    let newUserProject = UserProject._handleSetUp(currentUserProject);
+    newUserProject._selectedUserItemIdList = [];
+    newUserProject = UserProject._handleCleanUp(newUserProject);
+    return newUserProject;
   }
   public static handleRename(
     currentUserProject: UserProject,
     options: MethodOptions
   ): UserProject {
-    console.log("create file", options);
+    try {
+      let newUserProject = UserProject._handleSetUp(currentUserProject);
+      if (options.name && options.iconColor) {
+        const selectedListLen = newUserProject.selectedUserItemIdList.length;
+        if (selectedListLen > 0) {
+          const itemId =
+            newUserProject.selectedUserItemIdList[selectedListLen - 1];
+          let itemToRename = newUserProject.getItemReferenceById(itemId);
+
+          if (itemToRename) {
+            itemToRename.name = options.name;
+            itemToRename.iconColor = options.iconColor;
+            if (itemToRename instanceof UserFile) {
+              const fileListLen = newUserProject._userFileList.length;
+              for (let i = 0; i < fileListLen; i++) {
+                if (newUserProject._userFileList[i].id === itemId) {
+                  newUserProject._userFileList[i] = itemToRename;
+                }
+              }
+            } else {
+              const folderListLen = newUserProject._userFolderList.length;
+              for (let i = 0; i < folderListLen; i++) {
+                if (newUserProject._userFolderList[i].id === itemId) {
+                  newUserProject._userFolderList[i] = itemToRename;
+                }
+              }
+            }
+          }
+        }
+        newUserProject = UserProject._handleCleanUp(newUserProject);
+        return newUserProject;
+      } else {
+        throw new Error(
+          "UserProject.handleCreateFile:: Error at creating a new node in the user tree"
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      return currentUserProject;
+    }
+
     return currentUserProject;
   }
   public static handleDelete(
@@ -196,21 +541,28 @@ class UserProject {
     currentUserProject: UserProject,
     options: MethodOptions
   ): UserProject {
-    console.log("create file", options);
-    return currentUserProject;
+    let newUserProject = UserProject._handleSetUp(currentUserProject);
+    newUserProject = UserProject._handleCleanUp(newUserProject);
+    return newUserProject;
   }
   public static handleCollapse(
     currentUserProject: UserProject,
     options: MethodOptions
   ): UserProject {
-    console.log("create file", options);
-    return currentUserProject;
+    let newUserProject = UserProject._handleSetUp(currentUserProject);
+
+    const folderListLen = newUserProject._userFolderList.length;
+    for (let i = 0; i < folderListLen; i++) {
+      newUserProject._userFolderList[i].isOpenInFileExplorer = false;
+    }
+
+    newUserProject = UserProject._handleCleanUp(newUserProject);
+    return newUserProject;
   }
   public static none(
     currentUserProject: UserProject,
     options: MethodOptions
   ): UserProject {
-    console.log("create file", options);
     return currentUserProject;
   }
 }
@@ -218,6 +570,20 @@ class UserProject {
 export default UserProject;
 
 /**Utility types and functions */
+export const MethodsSupportedList: MethodsSupported[] = [
+  "handleCreateFile",
+  "handleCreateFolder",
+  "handleRename",
+  "handleDelete",
+  "handleUpload",
+  "handleDownload",
+  "handleDeselect",
+  "handleSelect",
+  "handleRefresh",
+  "handleCollapse",
+  "none",
+];
+
 export type ModifierMethodsSupported =
   | "handleCreateFile"
   | "handleCreateFolder"
@@ -268,16 +634,3 @@ export function castToMofierMethod(
 export function castToMethodOptions(opt: MethodOptions): MethodOptions {
   return opt;
 }
-
-export const MethodsSupportedList: MethodsSupported[] = [
-  "handleCreateFile",
-  "handleCreateFolder",
-  "handleRename",
-  "handleDelete",
-  "handleUpload",
-  "handleDownload",
-  "handleDeselect",
-  "handleSelect",
-  "handleRefresh",
-  "handleCollapse",
-];

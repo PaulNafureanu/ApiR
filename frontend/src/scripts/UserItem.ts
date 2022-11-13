@@ -51,6 +51,20 @@ export class UserFile extends UserItem {
     this.fileFormat = fileFormat;
     this.isOpenInFileViewer = isOpenInFileViewer;
   }
+
+  public getFileClone(): UserFile {
+    const fileId: number = parseInt(this.id.slice(0, -1));
+    const newFile = new UserFile(
+      fileId,
+      this.name,
+      this.fileFormat,
+      this.iconColor,
+      this.isVisibleInFileExplorer,
+      this.isOpenInFileViewer
+    );
+
+    return newFile;
+  }
 }
 
 export class UserFolder extends UserItem {
@@ -68,5 +82,19 @@ export class UserFolder extends UserItem {
     super(id, "folder", name, iconColor, isVisibleInFileExplorer);
     this.folderFormat = folderFormat;
     this.isOpenInFileExplorer = isOpenInFileExplorer;
+  }
+
+  public getFolderClone(): UserFolder {
+    const folderId: number = parseInt(this.id.slice(0, -1));
+    const newFolder = new UserFolder(
+      folderId,
+      this.name,
+      this.folderFormat,
+      this.iconColor,
+      this.isVisibleInFileExplorer,
+      this.isOpenInFileExplorer
+    );
+
+    return newFolder;
   }
 }

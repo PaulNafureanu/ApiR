@@ -36,7 +36,8 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
       id: "",
       isCtrlPressed: false,
       isShiftPressed: false,
-      file: undefined,
+      files: undefined,
+      fileFormat: "app",
     })
   );
 
@@ -62,8 +63,10 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
 
   function handleFileExplorerButtonClick(options: MethodOptions) {
     if (!isAModifierMethod(options.method)) {
-      let newUserProject = UserProject[options.method](userProject, options);
-      if (newUserProject) setUserProject(newUserProject);
+      const newUserProject = UserProject[options.method](userProject, options);
+      if (newUserProject) {
+        setUserProject(newUserProject);
+      }
     }
     setMethodOptions(options);
   }

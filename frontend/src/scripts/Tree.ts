@@ -7,6 +7,14 @@ export interface TreeNode {
   children: TreeNode[];
 }
 
+export function getTreeNodeClone(target:TreeNode, source: TreeNode):TreeNode{
+  target.id = source.id;
+  target.parentId = source.parentId
+  target.layer = source.layer;
+  target.children = structuredClone(source.children);
+  return target;
+}
+
 export class Tree {
   /**Private properties */
   private _root: TreeNode;
@@ -18,6 +26,12 @@ export class Tree {
   }
 
   /** Accessors */
+  public getTreeClone(): Tree {
+    let newTree = new Tree();
+    newTree._idList = structuredClone(this._idList);
+    newTree._root = structuredClone(this._root);
+    return newTree;
+  }
   public get root() {
     return this._root;
   }
@@ -245,7 +259,7 @@ export class Tree {
     targetId: string,
     tree: Tree
   ): Tree | false {
-    const newTree: Tree = structuredClone(tree);
+    const newTree: Tree = tree.getTreeClone();
     if (!newTree._idList.includes(id)) {
       if (newTree._idList.includes(targetId)) {
         const result = Tree._createNode(id, targetId, newTree._root);
@@ -283,7 +297,7 @@ export class Tree {
       return false;
     }
 
-    const newTree: Tree = structuredClone(tree);
+    const newTree: Tree = tree.getTreeClone();
     if (newTree._idList.includes(id)) {
       const result = Tree._deleteNode(id, newTree._root);
       if (result) {
@@ -321,7 +335,7 @@ export class Tree {
     targetId: string,
     tree: Tree
   ): Tree | false {
-    const treeCopy: Tree = structuredClone(tree);
+    const treeCopy: Tree = tree.getTreeClone();
     const idListCopy: string[] = structuredClone(treeCopy._idList);
 
     const resultGetNode = Tree.getNode(id, treeCopy);
@@ -361,7 +375,7 @@ export class Tree {
   }
 
   public static getNode(id: string, tree: Tree): TreeNode | false {
-    const newTree: Tree = structuredClone(tree);
+    const newTree: Tree = tree.getTreeClone();
 
     if (newTree._idList.includes(id)) {
       const result = Tree._getNode(id, newTree._root);

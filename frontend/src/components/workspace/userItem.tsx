@@ -195,7 +195,7 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
       style={getUserItemStyle()}
     >
       <div className="icons" style={getIconsStyle()}>
-        {itemType.includes("Folder") ? (
+        {itemType === "folder" ? (
           <div className="dropDownIcon">
             <img
               src="./svgs/arrow.svg"
