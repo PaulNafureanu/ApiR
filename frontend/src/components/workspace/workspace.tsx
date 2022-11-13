@@ -38,11 +38,12 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
       isShiftPressed: false,
       files: undefined,
       fileFormat: "app",
+      targetId: "",
+      sourceId: "",
     })
   );
 
   /**Listeners */
-
   window.addEventListener("keydown", (e) => {
     if (e.key == "Escape") {
       const optionCopy: MethodOptions = structuredClone(methodOptions);
@@ -52,7 +53,6 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
   });
 
   /**Handlers */
-
   function handleOnClickSidebar(sidebar: "left" | "right") {
     if (sidebar == "left") {
       setIsLeftSidebarOpen(!isLeftSidebarOpen);
@@ -60,7 +60,6 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
       setIsRightSidebarOpen(!isRightSidebarOpen);
     }
   }
-
   function handleFileExplorerButtonClick(options: MethodOptions) {
     if (!isAModifierMethod(options.method)) {
       const newUserProject = UserProject[options.method](userProject, options);
@@ -70,7 +69,6 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
     }
     setMethodOptions(options);
   }
-
   /**Renders */
   function getCustomUserSpaceStyle() {
     let CustomeUserSpaceStyle = {
@@ -95,7 +93,6 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
 
     return CustomeUserSpaceStyle;
   }
-
   function renderCreateMenu() {
     if (!isAModifierMethod(methodOptions.method)) return;
     return (

@@ -1,4 +1,3 @@
-import structuredClone from "@ungap/structured-clone";
 import { getTreeNodeClone, Tree, TreeNode } from "./Tree";
 import {
   UserFile,
@@ -17,6 +16,8 @@ export interface MethodOptions {
   isShiftPressed?: boolean;
   files?: FileList;
   fileFormat?: fileFormat;
+  targetId?: string;
+  sourceId?: string;
 }
 
 class UserProject {
@@ -82,6 +83,115 @@ class UserProject {
   /***Instance methods */
 
   /**Private instance methods */
+
+  private _getAllItemIdsFromFolder(folderNode: TreeNode): string[] {
+    let folderItemIds: string[] = [];
+    if (folderNode.children && folderNode.children.length > 0) {
+      let len = folderNode.children.length;
+      for (let i = 0; i < len; i++) {
+        let childNode = folderNode.children[i];
+        folderItemIds.push(childNode.id);
+        if (childNode.children.length > 0) {
+          folderItemIds.concat(this._getAllItemIdsFromFolder(childNode));
+        }
+      }
+    }
+    return folderItemIds;
+  }
+  private _findSelectedItemsToAdd(
+    currentUserItemSelectedId: string,
+    previousUserItemSelectedId: string,
+    userItemsTreeNodes: TreeNode[],
+    startAdding: boolean,
+    stopAdding: boolean
+  ): { selectedArr: string[]; start: boolean; stop: boolean } {
+    if (stopAdding) {
+      return {
+        selectedArr: [],
+        start: startAdding,
+        stop: stopAdding,
+      };
+    }
+    let selectedUserItemsToAdd: string[] = [];
+    for (let i = 0; i < userItemsTreeNodes.length; i++) {
+      if (stopAdding) {
+        return {
+          selectedArr: selectedUserItemsToAdd,
+          start: startAdding,
+          stop: stopAdding,
+        };
+      }
+      if (startAdding) {
+        if (
+          userItemsTreeNodes[i].id === currentUserItemSelectedId ||
+          userItemsTreeNodes[i].id === previousUserItemSelectedId
+        ) {
+          selectedUserItemsToAdd.push(userItemsTreeNodes[i].id);
+
+          if (userItemsTreeNodes[i].children.length > 0) {
+            let result = this._getAllItemIdsFromFolder(userItemsTreeNodes[i]);
+            selectedUserItemsToAdd = selectedUserItemsToAdd.concat(result);
+          }
+
+          stopAdding = true;
+          startAdding = false;
+          return {
+            selectedArr: selectedUserItemsToAdd,
+            start: startAdding,
+            stop: stopAdding,
+          };
+        }
+
+        selectedUserItemsToAdd.push(userItemsTreeNodes[i].id);
+
+        if (userItemsTreeNodes[i].children.length > 0) {
+          let resultFromFind = this._findSelectedItemsToAdd(
+            currentUserItemSelectedId,
+            previousUserItemSelectedId,
+            userItemsTreeNodes[i].children,
+            startAdding,
+            stopAdding
+          );
+          selectedUserItemsToAdd = selectedUserItemsToAdd.concat(
+            resultFromFind.selectedArr
+          );
+
+          startAdding = resultFromFind.start;
+          stopAdding = resultFromFind.stop;
+        }
+      } else {
+        if (
+          userItemsTreeNodes[i].id === currentUserItemSelectedId ||
+          userItemsTreeNodes[i].id === previousUserItemSelectedId
+        ) {
+          startAdding = true;
+          stopAdding = false;
+          selectedUserItemsToAdd.push(userItemsTreeNodes[i].id);
+        }
+
+        if (userItemsTreeNodes[i].children.length > 0) {
+          let resultFromFind = this._findSelectedItemsToAdd(
+            currentUserItemSelectedId,
+            previousUserItemSelectedId,
+            userItemsTreeNodes[i].children,
+            startAdding,
+            stopAdding
+          );
+          selectedUserItemsToAdd = selectedUserItemsToAdd.concat(
+            resultFromFind.selectedArr
+          );
+
+          startAdding = resultFromFind.start;
+          stopAdding = resultFromFind.stop;
+        }
+      }
+    }
+    return {
+      selectedArr: selectedUserItemsToAdd,
+      start: startAdding,
+      stop: stopAdding,
+    };
+  }
   private _sortUsertItems(userItemsTreeNodes: TreeNode[]): TreeNode[] {
     function sortArray(
       currentUserProject: UserProject,
@@ -161,12 +271,11 @@ class UserProject {
     }
     return sortedUserItemsTreeNodes;
   }
-
   private _setVisibleItems(userItemsTreeNodes: TreeNode[], value: boolean) {
     const len = userItemsTreeNodes.length;
 
     for (let i = 0; i < len; i++) {
-      let userItem = this.getItemReferenceById(userItemsTreeNodes[i].id);
+      let userItem = this.getItemReferenceById(userItemsTreeNodes[i].id, false);
       if (userItem) {
         userItem.isVisibleInFileExplorer = value;
         if (userItem instanceof UserFolder) {
@@ -183,49 +292,98 @@ class UserProject {
       }
     }
   }
+  private _removeSelectedItem(id: string) {
+    const len = this.selectedUserItemIdList.length;
+    for (let i = 0; i < len; i++) {
+      if (this.selectedUserItemIdList[i] == id) {
+        this.selectedUserItemIdList.splice(i, 1);
+        break;
+      }
+    }
+
+    if (this.selectedUserItemIdList.includes(id)) {
+      this._removeSelectedItem(id);
+    }
+  }
+  private _selectItemsFromAFolder(folderId: string, select: boolean = true) {
+    let userItemNode = Tree.getNode(folderId, this._userTree);
+    if (userItemNode) {
+      let len = userItemNode.children.length;
+      for (let i = 0; i < len; i++) {
+        let childId = userItemNode.children[i].id;
+        let userItem = this.getItemReferenceById(childId);
+
+        if (select) {
+          if (!this.selectedUserItemIdList.includes(childId)) {
+            this.selectedUserItemIdList.push(childId);
+            if (userItem instanceof UserFolder) {
+              this._selectItemsFromAFolder(childId, true);
+            }
+          }
+        } else {
+          if (this.selectedUserItemIdList.includes(childId)) {
+            this._removeSelectedItem(childId);
+            if (userItem instanceof UserFolder) {
+              this._selectItemsFromAFolder(childId, false);
+            }
+          }
+        }
+      }
+    }
+  }
 
   /** Public instance methods */
-  public getItemReferenceById(id: string): UserFile | UserFolder | false {
+  public getItemReferenceById(
+    id: string,
+    getDeepCopy: boolean = true
+  ): UserFile | UserFolder | false {
     const lenFileList = this._userFileList.length;
     const lenFolderList = this._userFolderList.length;
 
     for (let i = 0; i < lenFileList; i++) {
       if (this._userFileList[i].id === id) {
-        const file = this._userFileList[i];
-        const fileId: number = parseInt(file.id.slice(0, -1));
-        const newFile = new UserFile(
-          fileId,
-          file.name,
-          file.fileFormat,
-          file.iconColor,
-          file.isVisibleInFileExplorer,
-          file.isOpenInFileViewer
-        );
+        if (getDeepCopy) {
+          const file = this._userFileList[i];
+          const fileId: number = parseInt(file.id.slice(0, -1));
+          const newFile = new UserFile(
+            fileId,
+            file.name,
+            file.fileFormat,
+            file.iconColor,
+            file.isVisibleInFileExplorer,
+            file.isOpenInFileViewer
+          );
 
-        return newFile;
+          return newFile;
+        } else {
+          return this._userFileList[i];
+        }
       }
     }
 
     for (let i = 0; i < lenFolderList; i++) {
       if (this._userFolderList[i].id === id) {
-        const folder = this._userFolderList[i];
-        const folderId: number = parseInt(folder.id.slice(0, -1));
-        const newFolder = new UserFolder(
-          folderId,
-          folder.name,
-          folder.folderFormat,
-          folder.iconColor,
-          folder.isVisibleInFileExplorer,
-          folder.isOpenInFileExplorer
-        );
+        if (getDeepCopy) {
+          const folder = this._userFolderList[i];
+          const folderId: number = parseInt(folder.id.slice(0, -1));
+          const newFolder = new UserFolder(
+            folderId,
+            folder.name,
+            folder.folderFormat,
+            folder.iconColor,
+            folder.isVisibleInFileExplorer,
+            folder.isOpenInFileExplorer
+          );
 
-        return newFolder;
+          return newFolder;
+        } else {
+          return this._userFolderList[i];
+        }
       }
     }
 
     return false;
   }
-
   public countVisibleItems() {
     let count = 0;
     function iterateTreeNode(
@@ -246,6 +404,7 @@ class UserProject {
     }
 
     iterateTreeNode(this.userTree.root.children, this);
+
     return count;
   }
 
@@ -256,10 +415,10 @@ class UserProject {
   }
   private static _handleCleanUp(newUserProject: UserProject): UserProject {
     let userProjectClone = newUserProject.getUserProjectClone();
+
     userProjectClone._userTree.root.children = userProjectClone._sortUsertItems(
       userProjectClone._userTree.root.children
     );
-
     userProjectClone._setVisibleItems(
       userProjectClone._userTree.root.children,
       true
@@ -471,8 +630,100 @@ class UserProject {
     currentUserProject: UserProject,
     options: MethodOptions
   ): UserProject {
-    console.log("create file", options);
-    return currentUserProject;
+    try {
+      let newUserProject = UserProject._handleSetUp(currentUserProject);
+
+      if (options.id) {
+        let userItem = newUserProject.getItemReferenceById(options.id, false);
+
+        if (options.isCtrlPressed) {
+          if (newUserProject.selectedUserItemIdList.includes(options.id)) {
+            newUserProject._removeSelectedItem(options.id);
+
+            if (userItem instanceof UserFolder) {
+              newUserProject._selectItemsFromAFolder(options.id, false);
+            }
+          } else {
+            newUserProject._selectedUserItemIdList.push(options.id);
+            if (userItem instanceof UserFolder) {
+              newUserProject._selectItemsFromAFolder(options.id, true);
+            }
+          }
+        } else {
+          if (options.isShiftPressed) {
+            let previousUserItemSelectedId =
+              newUserProject.selectedUserItemIdList[
+                newUserProject.selectedUserItemIdList.length - 1
+              ];
+            let currentUserItemSelectedId = options.id;
+
+            let rootNodes: TreeNode[];
+            if (currentUserItemSelectedId !== previousUserItemSelectedId) {
+              rootNodes = newUserProject.userTree.root.children;
+
+              let selectedUserItemsToAdd: string[] =
+                newUserProject._findSelectedItemsToAdd(
+                  currentUserItemSelectedId,
+                  previousUserItemSelectedId,
+                  rootNodes,
+                  false,
+                  false
+                ).selectedArr;
+
+              for (let i = 0; i < selectedUserItemsToAdd.length; i++) {
+                if (
+                  newUserProject.selectedUserItemIdList.includes(
+                    selectedUserItemsToAdd[i]
+                  )
+                ) {
+                  continue;
+                } else {
+                  newUserProject._selectedUserItemIdList.push(
+                    selectedUserItemsToAdd[i]
+                  );
+                }
+              }
+            }
+          } else {
+            newUserProject._selectedUserItemIdList = [];
+            let userItemNode = Tree.getNode(
+              options.id,
+              newUserProject._userTree
+            );
+
+            if (userItemNode && userItem instanceof UserFile) {
+              newUserProject._selectedUserItemIdList.push(options.id);
+              userItem.isOpenInFileViewer = true;
+              newUserProject._activeWorkingFileId = options.id;
+              if (userItemNode.layer === 1) {
+                newUserProject._activeWorkingFolderId = "0";
+              }
+              if (userItemNode.layer > 1) {
+                newUserProject._activeWorkingFolderId = userItemNode.parentId;
+              }
+            }
+            if (userItemNode && userItem instanceof UserFolder) {
+              newUserProject._selectItemsFromAFolder(options.id);
+              newUserProject._selectedUserItemIdList.push(options.id);
+              userItem.isOpenInFileExplorer = !userItem.isOpenInFileExplorer;
+              if (userItem.isOpenInFileExplorer)
+                userItem.folderFormat = "OpenFolder";
+              else userItem.folderFormat = "ClosedFolder";
+              newUserProject._activeWorkingFolderId = options.id;
+            }
+          }
+        }
+
+        newUserProject = UserProject._handleCleanUp(newUserProject);
+
+        return newUserProject;
+      } else {
+        throw new Error("UserProject.handleSelect:: Item id not defined");
+      }
+    } catch (err) {
+      console.error(err);
+      return currentUserProject;
+    }
   }
   public static handleDeselect(
     currentUserProject: UserProject,
@@ -480,6 +731,7 @@ class UserProject {
   ): UserProject {
     let newUserProject = UserProject._handleSetUp(currentUserProject);
     newUserProject._selectedUserItemIdList = [];
+    newUserProject._activeWorkingFolderId = "0";
     newUserProject = UserProject._handleCleanUp(newUserProject);
     return newUserProject;
   }
@@ -534,8 +786,103 @@ class UserProject {
     currentUserProject: UserProject,
     options: MethodOptions
   ): UserProject {
-    console.log("create file", options);
-    return currentUserProject;
+    try {
+      let newUserProject = UserProject._handleSetUp(currentUserProject);
+
+      let len = newUserProject.selectedUserItemIdList.length;
+
+      let selectedFolderIds: string[] = [];
+      let selectedFileIds: string[] = [];
+
+      for (let i = 0; i < len; i++) {
+        let userItemToDeleteId = newUserProject.selectedUserItemIdList[i];
+        let userItem = newUserProject.getItemReferenceById(userItemToDeleteId);
+
+        if (userItem instanceof UserFolder) {
+          selectedFolderIds.push(userItemToDeleteId);
+        }
+        if (userItem instanceof UserFile) {
+          selectedFileIds.push(userItemToDeleteId);
+        }
+      }
+
+      let selectedItems = selectedFolderIds.concat(selectedFileIds);
+      let removedItems: string[] = [];
+
+      if (len > 0) {
+        for (let i = 0; i < len; i++) {
+          let itemToDeleteId = selectedItems[i];
+          let userItemToDelete =
+            newUserProject.getItemReferenceById(itemToDeleteId);
+          if (removedItems.includes(itemToDeleteId)) {
+            continue;
+          }
+
+          if (userItemToDelete instanceof UserFile) {
+            newUserProject._activeWorkingFileId = "0";
+
+            const lenFiles = newUserProject._userFileList.length;
+            for (let i = 0; i < lenFiles; i++) {
+              if (itemToDeleteId === newUserProject._userFileList[i].id) {
+                newUserProject._userFileList.splice(i, 1);
+                break;
+              }
+            }
+
+            removedItems.push(itemToDeleteId);
+          }
+
+          if (userItemToDelete instanceof UserFolder) {
+            newUserProject._activeWorkingFolderId = "0";
+
+            const lenFolders = newUserProject._userFolderList.length;
+            for (let i = 0; i < lenFolders; i++) {
+              if (itemToDeleteId === newUserProject._userFolderList[i].id) {
+                newUserProject._userFolderList.splice(i, 1);
+                break;
+              }
+            }
+
+            let userItemToDeleteNode = Tree.getNode(
+              itemToDeleteId,
+              newUserProject._userTree
+            );
+            if (userItemToDeleteNode) {
+              removedItems = removedItems.concat(
+                newUserProject._getAllItemIdsFromFolder(userItemToDeleteNode)
+              );
+            }
+          }
+
+          const lenItems = newUserProject._userItemIdList.length;
+          for (let i = 0; i < lenItems; i++) {
+            if (itemToDeleteId === newUserProject._userItemIdList[i]) {
+              newUserProject._userItemIdList.splice(i, 1);
+              break;
+            }
+          }
+
+          let newTree = Tree.deleteNode(
+            itemToDeleteId,
+            newUserProject._userTree
+          );
+          if (newTree) {
+            newUserProject._userTree = newTree;
+          } else {
+            throw new Error(
+              "UserProject.handleDelete:: Error at deleting a node in the user tree"
+            );
+          }
+
+          newUserProject._removeSelectedItem(itemToDeleteId);
+        }
+      }
+
+      return newUserProject;
+    } catch (err) {
+      console.error(err);
+      return currentUserProject;
+    }
   }
   public static handleRefresh(
     currentUserProject: UserProject,
@@ -559,11 +906,78 @@ class UserProject {
     newUserProject = UserProject._handleCleanUp(newUserProject);
     return newUserProject;
   }
+  public static handleMove(
+    currentUserProject: UserProject,
+    options: MethodOptions
+  ): UserProject {
+    try {
+      let newUserProject = UserProject._handleSetUp(currentUserProject);
+
+      if (options.targetId === options.sourceId) return currentUserProject;
+
+      if (options.targetId && options.sourceId) {
+        let userItem = newUserProject.getItemReferenceById(options.targetId);
+        let targetId = options.targetId;
+
+        if (userItem instanceof UserFile) {
+          let targetNode = Tree.getNode(
+            options.targetId,
+            newUserProject._userTree
+          );
+          if (targetNode) {
+            targetId = targetNode.parentId;
+          } else {
+            throw new Error(
+              "UserProject.handleMove:: Error at getting a node in the user tree"
+            );
+          }
+        }
+
+        let newTree = Tree.moveNode(
+          options.sourceId,
+          targetId,
+          newUserProject._userTree
+        );
+        if (newTree) {
+          newUserProject._userTree = newTree;
+        } else {
+          throw new Error(
+            "UserProject.handleMove:: Error at moving a node in the user tree"
+          );
+        }
+        newUserProject = UserProject._handleCleanUp(newUserProject);
+
+        console.log("move4");
+        return newUserProject;
+      } else {
+        throw new Error(
+          "UserProject.handleMove:: Taget Id and / or Source Id not defined"
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      return currentUserProject;
+    }
+  }
   public static none(
     currentUserProject: UserProject,
     options: MethodOptions
   ): UserProject {
-    return currentUserProject;
+    try {
+      let newUserProject = UserProject._handleSetUp(currentUserProject);
+
+      if (options) {
+        //Implementation
+        newUserProject = UserProject._handleCleanUp(newUserProject);
+
+        return newUserProject;
+      } else {
+        throw new Error("UserProject.handleNone:: Options not defined");
+      }
+    } catch (err) {
+      console.error(err);
+      return currentUserProject;
+    }
   }
 }
 
@@ -581,6 +995,7 @@ export const MethodsSupportedList: MethodsSupported[] = [
   "handleSelect",
   "handleRefresh",
   "handleCollapse",
+  "handleMove",
   "none",
 ];
 
@@ -596,7 +1011,8 @@ export type ExtraMethodsSupported =
   | "handleSelect"
   | "handleDeselect"
   | "handleRefresh"
-  | "handleCollapse";
+  | "handleCollapse"
+  | "handleMove";
 
 export type MethodsSupported = ModifierMethodsSupported | ExtraMethodsSupported;
 
@@ -622,6 +1038,7 @@ export function isAnExtraMethod(
     "handleDeselect",
     "handleRefresh",
     "handleCollapse",
+    "handleMove",
   ].includes(value);
 }
 

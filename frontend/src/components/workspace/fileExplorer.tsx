@@ -45,6 +45,7 @@ const FileExplorer: React.FunctionComponent<FileExplorerProps> = ({
   function getFreeSpaceStyle() {
     let freeSpaceStyle;
     let count = userProject.countVisibleItems();
+
     freeSpaceStyle = {
       height: `calc(99% - ${1.5 * count}rem)`,
       borderBottom: "3px dotted rgba(255,255,255,0.05)",
@@ -192,6 +193,13 @@ const FileExplorer: React.FunctionComponent<FileExplorerProps> = ({
               optionCopy.id = id;
               optionCopy.isCtrlPressed = isCtrlPressed;
               optionCopy.isShiftPressed = isShiftPressed;
+              handleFileExplorerButtonClick(optionCopy);
+            }}
+            handleMove={(targetId, sourceId) => {
+              const optionCopy: MethodOptions = structuredClone(methodOptions);
+              optionCopy.method = "handleMove";
+              optionCopy.targetId = targetId;
+              optionCopy.sourceId = sourceId;
               handleFileExplorerButtonClick(optionCopy);
             }}
             key={userItem.id}

@@ -17,6 +17,7 @@ interface UserItemProps {
     isCtrlPressed: boolean,
     isShiftPressed: boolean
   ) => void;
+  handleMove: (targetId: string, sourceId: string) => void;
 }
 
 const UserItem: React.FunctionComponent<UserItemProps> = ({
@@ -30,6 +31,7 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
   iconColor,
   layer,
   handleSelect,
+  handleMove,
 }) => {
   function getIconItem(itemFormat: folderFormat | fileFormat) {
     switch (itemFormat) {
@@ -193,6 +195,18 @@ const UserItem: React.FunctionComponent<UserItemProps> = ({
         handleSelect(itemId, isCtrlPressed, isShiftPressed);
       }}
       style={getUserItemStyle()}
+      draggable={true}
+      onDragStart={(e) => {
+        e.dataTransfer.setData("id", itemId);
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        let sourceId = e.dataTransfer.getData("id");
+        handleMove(itemId, sourceId);
+      }}
+      onDragOver={(e) => {
+        e.preventDefault();
+      }}
     >
       <div className="icons" style={getIconsStyle()}>
         {itemType === "folder" ? (
