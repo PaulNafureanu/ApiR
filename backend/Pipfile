@@ -5,11 +5,6 @@ name = "pypi"
 
 [packages]
 django = "*"
-mysqlclient = "*"
-google-api-python-client = "*"
-google-auth-httplib2 = "*"
-google-auth-oauthlib = "*"
-djangorestframework = "*"
 
 [dev-packages]
 
