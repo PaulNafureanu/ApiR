@@ -79,6 +79,16 @@ class UserProject {
   public get selectedUserItemIdList() {
     return this._selectedUserItemIdList;
   }
+  public get getOpenUserFileIdList() {
+    let openUserFileIdList: string[] = [];
+    const len = this._userFileList.length;
+    for (let i = 0; i < len; i++) {
+      if (this._userFileList[i].isOpenInFileViewer) {
+        openUserFileIdList.push(this._userFileList[i].id);
+      }
+    }
+    return openUserFileIdList;
+  }
 
   /***Instance methods */
 
@@ -938,6 +948,7 @@ class UserProject {
           targetId,
           newUserProject._userTree
         );
+        console.log(newTree);
         if (newTree) {
           newUserProject._userTree = newTree;
         } else {
@@ -947,7 +958,6 @@ class UserProject {
         }
         newUserProject = UserProject._handleCleanUp(newUserProject);
 
-        console.log("move4");
         return newUserProject;
       } else {
         throw new Error(

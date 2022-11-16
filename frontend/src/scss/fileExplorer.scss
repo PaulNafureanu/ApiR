@@ -6,10 +6,14 @@
   border: 1px solid #fff1;
   border-top: none;
   border-bottom: none;
-  box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.2),
-    3.3px 3.3px 5.3px rgba(0, 0, 0, 0.028),
-    11.2px 11.2px 17.9px rgba(0, 0, 0, 0.042),
-    50px 50px 80px rgba(0, 0, 0, 0.07);
+  // box-shadow: -1px 1px 3px rgba(0, 0, 0, 0.2),
+  //   3.3px 3.3px 5.3px rgba(0, 0, 0, 0.028),
+  //   11.2px 11.2px 17.9px rgba(0, 0, 0, 0.042),
+  //   50px 50px 80px rgba(0, 0, 0, 0.07);
+
+  box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.04),
+    22.3px 22.3px 17.9px rgba(0, 0, 0, 0.06),
+    100px 100px 80px rgba(0, 0, 0, 0.1);
   transition: 0.2s;
   overflow: hidden;
   .title {

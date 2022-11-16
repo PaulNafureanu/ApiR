@@ -1,3 +1,174 @@
-
+.fileViewer {
+  box-sizing: content-box;
+  overflow: auto;
+  /* width */
+  /* Track */
+  /* Handle */
+  font-size: 0.9rem;
+  color: #bbb;
+}
+.fileViewer::-webkit-scrollbar {
+  width: 1rem;
+  height: 1rem;
+}
+.fileViewer::-webkit-scrollbar-track {
+  background: rgba(34, 34, 34, 0.2666666667);
+  border: 1px solid rgba(255, 255, 255, 0.1333333333);
+  border-radius: 0.6rem;
+  margin: 1rem;
+}
+.fileViewer::-webkit-scrollbar-corner {
+  background: transparent;
+}
+.fileViewer::-webkit-scrollbar-thumb {
+  background: rgba(84, 84, 84, 0.5333333333);
+  border-radius: 0.6rem;
+}
+.fileViewer .fileNameContainer {
+  position: fixed;
+  width: 100%;
+  height: fit-content;
+}
+.fileViewer .fileNameContainer:hover .fileNameBar {
+  visibility: visible;
+}
+.fileViewer .fileNameBar {
+  display: flex;
+  background-color: rgba(34, 34, 34, 0.8666666667);
+  visibility: hidden;
+  transition: 0.1s;
+}
+.fileViewer .bodyFile {
+  margin: 1.5rem 0;
+  display: flex;
+  justify-content: center;
+}
+.fileViewer .bodyFile .title {
+  font-family: "Courgette", cursive !important;
+  font-weight: bold;
+  font-size: 3rem;
+  color: white;
+  text-align: center;
+}
+.fileViewer .fileContent {
+  padding: 4rem 3rem 3rem;
+  background-color: rgba(250, 250, 200, 0.1);
+  width: 90%;
+  border-radius: 1rem;
+  box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.04), 22.3px 22.3px 17.9px rgba(0, 0, 0, 0.06), 100px 100px 80px rgba(0, 0, 0, 0.1);
+}
+.fileViewer .fileContent .questionGrid {
+  border: 1px solid rgba(255, 255, 255, 0.5333333333);
+  border-radius: 1rem;
+  padding: 1rem 0;
+  margin: 3rem 0;
+  box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.04), 22.3px 22.3px 17.9px rgba(0, 0, 0, 0.06), 100px 100px 80px rgba(0, 0, 0, 0.1);
+}
+.fileViewer .fileContent .questionGrid .question {
+  display: flex;
+  height: 2.5rem;
+}
+.fileViewer .fileContent .questionGrid .question .specificQuestion {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.fileViewer .fileContent .questionGrid .question .specificQuestion p {
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  font-weight: bold;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.3s;
+}
+.fileViewer .fileContent .questionGrid .question .specificQuestion input {
+  font-style: italic;
+  padding: 0 0.5rem;
+  width: 90%;
+  background-color: transparent;
+  border: transparent;
+  border-radius: 0;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.05);
+  color: white;
+  transition: 0.3s;
+  height: 2rem;
+}
+.fileViewer .fileContent .questionGrid .question .specificQuestion input:hover {
+  border: 1px dotted rgba(255, 255, 255, 0.5333333333);
+  border-radius: 1rem;
+}
+.fileViewer .fileContent .questionGrid .question .specificQuestion input:focus {
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.5333333333);
+  outline: none;
+}
+.fileViewer .fileContent .questionGrid .answer {
+  margin-left: 5rem;
+  height: 2.5rem;
+  display: flex;
+}
+.fileViewer .fileContent .questionGrid .answer .specificAnswer {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.fileViewer .fileContent .questionGrid .answer .specificAnswer p {
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  font-weight: bold;
+  color: white;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.3s;
+}
+.fileViewer .fileContent .questionGrid .answer .specificAnswer input {
+  height: 2rem;
+  padding: 0 0.5rem;
+  font-style: italic;
+  width: 90%;
+  background-color: transparent;
+  border: transparent;
+  border-radius: 0;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.05);
+  color: white;
+  transition: 0.3s;
+}
+.fileViewer .fileContent .questionGrid .answer .specificAnswer input:hover {
+  border: 1px dotted rgba(255, 255, 255, 0.5333333333);
+  border-radius: 1rem;
+}
+.fileViewer .fileContent .questionGrid .answer .specificAnswer input:focus {
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.5333333333);
+  outline: none;
+}
+.fileViewer .fileContent .questionGrid .answer .addAnswer {
+  justify-content: left;
+}
+.fileViewer .fileContent p {
+  box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.121), 22.3px 22.3px 17.9px rgba(0, 0, 0, 0.179), 100px 100px 80px rgba(0, 0, 0, 0.3);
+}
+.fileViewer .fileContent button {
+  margin-left: 0.5rem;
+  background-color: white;
+  border: 1px solid white;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 1rem;
+  color: rgba(34, 34, 34, 0.8666666667);
+  padding: 0.1rem 1rem;
+  cursor: pointer;
+  box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.121), 22.3px 22.3px 17.9px rgba(0, 0, 0, 0.179), 100px 100px 80px rgba(0, 0, 0, 0.3);
+}
 
 /*# sourceMappingURL=fileViewer.css.map */

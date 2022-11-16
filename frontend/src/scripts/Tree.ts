@@ -7,9 +7,9 @@ export interface TreeNode {
   children: TreeNode[];
 }
 
-export function getTreeNodeClone(target:TreeNode, source: TreeNode):TreeNode{
+export function getTreeNodeClone(target: TreeNode, source: TreeNode): TreeNode {
   target.id = source.id;
-  target.parentId = source.parentId
+  target.parentId = source.parentId;
   target.layer = source.layer;
   target.children = structuredClone(source.children);
   return target;
@@ -73,7 +73,6 @@ export class Tree {
       }
     }
   }
-
   private static _deleteNode(id: string, root: TreeNode): TreeNode | false {
     if (id === "0") {
       return false;
@@ -103,7 +102,6 @@ export class Tree {
 
     return false;
   }
-
   private static _cleanUpIds(
     id: string,
     root: TreeNode,
@@ -151,7 +149,6 @@ export class Tree {
 
     return idListCopy;
   }
-
   private static _getNode(id: string, root: TreeNode): TreeNode | false {
     const rootCopy: TreeNode = structuredClone(root);
 
@@ -171,7 +168,6 @@ export class Tree {
       return false;
     }
   }
-
   private static _addNode(
     node: TreeNode,
     targetId: string,
@@ -288,7 +284,6 @@ export class Tree {
       return false;
     }
   }
-
   public static deleteNode(id: string, tree: Tree): Tree | false {
     if (id === "0") {
       console.error(
@@ -329,7 +324,6 @@ export class Tree {
       return false;
     }
   }
-
   public static moveNode(
     id: string,
     targetId: string,
@@ -373,7 +367,6 @@ export class Tree {
       return false;
     }
   }
-
   public static getNode(id: string, tree: Tree): TreeNode | false {
     const newTree: Tree = tree.getTreeClone();
 

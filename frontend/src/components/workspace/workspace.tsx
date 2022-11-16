@@ -128,7 +128,6 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
       />
     );
   }
-
   return (
     <div id="Workspace">
       <Menu
@@ -151,7 +150,7 @@ const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
             handleFileExplorerButtonClick={handleFileExplorerButtonClick}
           />
         </div>
-        <FileViewer />
+        <FileViewer userProject={userProject} />
         <RightSidebar
           customStyle={getCustomUserSpaceStyle().RightSidebarStyle}
         />

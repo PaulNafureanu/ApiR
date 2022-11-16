@@ -1,0 +1,20 @@
+.fileTitle {
+  background-color: rgba(29, 43, 58, 0.8666666667);
+  border: 1px solid #45f3ff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #bbb;
+  height: 1.5rem;
+  text-transform: uppercase;
+  width: 10rem;
+  font-weight: bolder;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.fileTitle .title {
+  width: fit-content;
+  height: fit-content;
+}
+
+/*# sourceMappingURL=fileTitle.css.map */

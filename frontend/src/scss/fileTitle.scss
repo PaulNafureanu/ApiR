@@ -1,0 +1,18 @@
+.fileTitle {
+  background-color: #1d2b3add;
+  border: 1px solid #45f3ff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #bbb;
+  height: 1.5rem;
+  text-transform: uppercase;
+  width: 10rem;
+  font-weight: bolder;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .title {
+    width: fit-content;
+    height: fit-content;
+  }
+}
