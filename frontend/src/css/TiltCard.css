@@ -50,19 +50,19 @@
     transform: rotate(360deg);
   }
 }
-.Tilt .userIn {
+.Tilt .form {
   z-index: 1;
   width: 26.5rem;
   height: 26.5rem;
   background-color: #1d2b3a;
   border-radius: 0.5rem;
 }
-.Tilt .userIn header {
+.Tilt .form header {
   height: 5rem;
   display: flex;
   font-size: 1.5rem;
 }
-.Tilt .userIn header div {
+.Tilt .form header .title {
   width: 100%;
   height: 100%;
   color: #45f3ff;
@@ -72,11 +72,11 @@
   align-items: center;
   text-align: center;
 }
-.Tilt .userIn main {
+.Tilt .form form {
   width: 100%;
   height: 100%;
 }
-.Tilt .userIn main .inputForm {
+.Tilt .form form .inputFieldWrapper {
   width: 100%;
   height: 16rem;
   display: flex;
@@ -85,12 +85,13 @@
   gap: 2rem;
   flex-direction: column;
 }
-.Tilt .userIn main .inputForm div.p {
+.Tilt .form form .inputFieldWrapper div.inputPassFieldWrapper {
   width: 20rem;
   height: fit-content;
   overflow: visible;
 }
-.Tilt .userIn main .inputForm div.s {
+.Tilt .form form .inputFieldWrapper div.signUpOption,
+.Tilt .form form .inputFieldWrapper div.logInOption {
   width: 20rem;
   height: 1.5rem;
   display: flex;
@@ -99,38 +100,44 @@
   font-size: 0.8rem;
   margin-top: 0.5rem;
 }
-.Tilt .userIn main .inputForm div.s span {
+.Tilt .form form .inputFieldWrapper div.signUpOption span,
+.Tilt .form form .inputFieldWrapper div.logInOption span {
   width: fit-content;
   height: 1.5rem;
   padding: 0 0.5rem;
   display: flex;
   align-items: center;
 }
-.Tilt .userIn main .inputForm div.s .fp {
+.Tilt .form form .inputFieldWrapper div.signUpOption .forgetPasswordOption,
+.Tilt .form form .inputFieldWrapper div.logInOption .forgetPasswordOption {
   color: rgba(255, 255, 255, 0.25);
   cursor: url("./../../public/cursors/cur222.cur"), auto;
   transition: 0.1s;
 }
-.Tilt .userIn main .inputForm div.s .fp:hover {
+.Tilt .form form .inputFieldWrapper div.signUpOption .forgetPasswordOption:hover,
+.Tilt .form form .inputFieldWrapper div.logInOption .forgetPasswordOption:hover {
   color: rgba(255, 255, 255, 0.75);
   font-size: 0.9rem;
 }
-.Tilt .userIn main .inputForm div.s .a {
+.Tilt .form form .inputFieldWrapper div.signUpOption .accountQuestion,
+.Tilt .form form .inputFieldWrapper div.logInOption .accountQuestion {
   color: rgba(255, 255, 255, 0.25);
 }
-.Tilt .userIn main .inputForm div.s .sgnUp {
+.Tilt .form form .inputFieldWrapper div.signUpOption .signUpText,
+.Tilt .form form .inputFieldWrapper div.signUpOption .logInText,
+.Tilt .form form .inputFieldWrapper div.logInOption .signUpText,
+.Tilt .form form .inputFieldWrapper div.logInOption .logInText {
   color: #45f3ff;
   cursor: url("./../../public/cursors/cur222.cur"), auto;
   transition: 0.1s;
 }
-.Tilt .userIn main .inputForm div.s .sgnUp:hover {
+.Tilt .form form .inputFieldWrapper div.signUpOption .signUpText:hover,
+.Tilt .form form .inputFieldWrapper div.signUpOption .logInText:hover,
+.Tilt .form form .inputFieldWrapper div.logInOption .signUpText:hover,
+.Tilt .form form .inputFieldWrapper div.logInOption .logInText:hover {
   font-size: 0.9rem;
 }
-.Tilt .userIn main .inputForm div.s .lgnIn {
-  color: #45f3ff;
-  cursor: url("./../../public/cursors/cur222.cur"), auto;
-}
-.Tilt .userIn main .buttonForm {
+.Tilt .form form .buttonForm {
   width: 100%;
   height: 100%;
   display: flex;
@@ -139,7 +146,7 @@
   height: 5.5rem;
   flex-direction: column;
 }
-.Tilt .userIn main .buttonForm button {
+.Tilt .form form .buttonForm button {
   cursor: url("./../../public/cursors/cur222.cur"), auto;
   background-color: #45f3ff;
   color: #1d2b3a;
@@ -157,12 +164,12 @@
   margin: 0.5rem;
   box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.121), 22.3px 22.3px 17.9px rgba(0, 0, 0, 0.179), 100px 100px 80px rgba(0, 0, 0, 0.3);
 }
-.Tilt .userIn main .buttonForm button:hover {
+.Tilt .form form .buttonForm button:hover {
   font-size: 1rem;
   outline: 1px solid white;
   transition: 0.2s;
 }
-.Tilt .userIn main .buttonForm span {
+.Tilt .form form .buttonForm span {
   width: 100%;
   height: 100%;
   height: fit-content;

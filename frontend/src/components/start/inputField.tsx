@@ -16,6 +16,7 @@ const InputField: React.FunctionComponent<InputFieldProps> = ({
   spanValue,
   em = false,
   value = "",
+  autoFocus = false,
   handleInputChange,
 }) => {
   function getClassName(em: boolean) {
@@ -26,12 +27,22 @@ const InputField: React.FunctionComponent<InputFieldProps> = ({
   }
   return (
     <div className="inputBox">
-      <input
-        value={value}
-        onChange={(event) => handleInputChange(event.target.value)}
-        type={inputType}
-        required={true}
-      ></input>
+      {autoFocus ? (
+        <input
+          autoFocus
+          value={value}
+          onChange={(event) => handleInputChange(event.target.value)}
+          type={inputType}
+          required={true}
+        ></input>
+      ) : (
+        <input
+          value={value}
+          onChange={(event) => handleInputChange(event.target.value)}
+          type={inputType}
+          required={true}
+        ></input>
+      )}
       <span className={getClassName(em)}>{spanValue}</span>
     </div>
   );

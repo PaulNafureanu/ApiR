@@ -1,10 +1,14 @@
 import * as React from "react";
-import TiltCard from "./TiltCard";
+import { AppState } from "../../App";
+import FormWrapper from "./formWrapper";
 import "./../../css/start.css";
 
-interface StartProps {}
+interface StartProps {
+  appState: AppState;
+  onChange: (value: any, location: string[]) => void;
+}
 
-const Start: React.FunctionComponent<StartProps> = () => {
+const Start: React.FunctionComponent<StartProps> = ({ appState, onChange }) => {
   const startRef = React.createRef<HTMLDivElement>();
   const [circleSize, setCircleSize] = React.useState(80);
   const [bgStyle, setBgStyle] = React.useState({
@@ -42,7 +46,7 @@ const Start: React.FunctionComponent<StartProps> = () => {
   return (
     <div id="Start" ref={startRef}>
       <div className="bg" style={bgStyle} />
-      <TiltCard />
+      <FormWrapper appState={appState} onChange={onChange} />
       <div className="bot">
         <div className="img"></div>
       </div>

@@ -55,7 +55,7 @@
       transform: rotate(360deg);
     }
   }
-  .userIn {
+  .form {
     z-index: 1;
     width: 26.5rem;
     // min-height: 26rem;
@@ -66,7 +66,7 @@
       height: 5rem;
       display: flex;
       font-size: 1.5rem;
-      div {
+      .title {
         width: 100%;
         height: 100%;
         color: #45f3ff;
@@ -77,10 +77,10 @@
         text-align: center;
       }
     }
-    main {
+    form {
       width: 100%;
       height: 100%;
-      .inputForm {
+      .inputFieldWrapper {
         width: 100%;
         height: 16rem;
         display: flex;
@@ -88,12 +88,13 @@
         align-items: center;
         gap: 2rem;
         flex-direction: column;
-        div.p {
+        div.inputPassFieldWrapper {
           width: 20rem;
           height: fit-content;
           overflow: visible;
         }
-        div.s {
+        div.signUpOption,
+        div.logInOption {
           width: 20rem;
           height: 1.5rem;
           display: flex;
@@ -109,7 +110,7 @@
             align-items: center;
           }
 
-          .fp {
+          .forgetPasswordOption {
             color: rgba(255, 255, 255, 0.25);
             cursor: url("./../../public/cursors/cur222.cur"), auto;
             transition: 0.1s;
@@ -118,10 +119,11 @@
               font-size: 0.9rem;
             }
           }
-          .a {
+          .accountQuestion {
             color: rgba(255, 255, 255, 0.25);
           }
-          .sgnUp {
+          .signUpText,
+          .logInText {
             color: #45f3ff;
             cursor: url("./../../public/cursors/cur222.cur"), auto;
             transition: 0.1s;
@@ -130,10 +132,10 @@
             }
           }
 
-          .lgnIn {
-            color: #45f3ff;
-            cursor: url("./../../public/cursors/cur222.cur"), auto;
-          }
+          // .lgnIn {
+          //   color: #45f3ff;
+          //   cursor: url("./../../public/cursors/cur222.cur"), auto;
+          // }
         }
       }
       .buttonForm {

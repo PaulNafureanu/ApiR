@@ -1,0 +1,4 @@
+{
+    "GoogleApiUrl": "http://127.0.0.1:8000/GoogleAPI/",
+    "AuthApiUrl": "http://127.0.0.1:8000/auth/"
+}
