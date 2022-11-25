@@ -10,29 +10,36 @@ export interface AppState {
     password: string;
     repeatPassword: string;
   };
+  errors: {};
   isUserLoggedIn: boolean;
 }
 
-export function returnAppState(obj: any): AppState {
-  return obj;
-}
-
 function App() {
-  const [appState, setAppState] = React.useState(
-    returnAppState({
-      account: { username: "", email: "", password: "", repeatPassword: "" },
-      isUserLoggedIn: false,
-    })
-  );
+  //State for the main interactions of the user with the app
 
-  function handleStateChange(value: any, location: string[]) {
-    // "Leo", ["account", "username"]
-    let newAppState: AppState = structuredClone(appState);
+  const [appState, setAppState] = React.useState({
+    account: { username: "", email: "", password: "", repeatPassword: "" },
+    errors: {},
+    isUserLoggedIn: false,
+  } as AppState);
+
+  // App State Modification. Example of a call: handleStateChange("Leo", ["account", "username"]);
+  function handleStateChange<Type>(value: Type, location: string[]) {
+    let newAppState = structuredClone(appState) as AppState;
     const len = location.length;
 
     function recursion(state: any, i: number): any {
       if (Object.keys(state).includes(location[i])) {
         if (i === len - 1) {
+          if (typeof value !== typeof state[location[i]]) {
+            console.error(
+              "App.handleStateChange:: Type not identical for value " +
+                value +
+                "and parameter " +
+                location[i]
+            );
+            return state;
+          }
           state[location[i]] = value;
           return state;
         } else {
@@ -51,7 +58,7 @@ function App() {
     }
 
     if (len > 0) {
-      newAppState = returnAppState(recursion(newAppState, 0));
+      newAppState = recursion(newAppState, 0) as AppState;
       setAppState(newAppState);
     }
   }

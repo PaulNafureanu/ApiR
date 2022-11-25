@@ -9,6 +9,7 @@ interface StartProps {
 }
 
 const Start: React.FunctionComponent<StartProps> = ({ appState, onChange }) => {
+  //State for the visual effects on the login/registration page
   const startRef = React.createRef<HTMLDivElement>();
   const [circleSize, setCircleSize] = React.useState(80);
   const [bgStyle, setBgStyle] = React.useState({
@@ -17,6 +18,7 @@ const Start: React.FunctionComponent<StartProps> = ({ appState, onChange }) => {
     clipPath: "none",
   });
 
+  //The lantern effect
   React.useEffect(() => {
     startRef.current?.addEventListener("mousemove", (e) => {
       setBgStyle({

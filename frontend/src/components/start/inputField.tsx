@@ -6,7 +6,7 @@ interface InputFieldProps {
   spanValue: string;
   em?: boolean;
   value?: string;
-  handleInputChange: (value: string) => void;
+  onChange: (value: string) => void;
   handleSubmit?: () => void;
   autoFocus?: boolean;
 }
@@ -17,7 +17,7 @@ const InputField: React.FunctionComponent<InputFieldProps> = ({
   em = false,
   value = "",
   autoFocus = false,
-  handleInputChange,
+  onChange,
 }) => {
   function getClassName(em: boolean) {
     if (em) return "em";
@@ -31,14 +31,14 @@ const InputField: React.FunctionComponent<InputFieldProps> = ({
         <input
           autoFocus
           value={value}
-          onChange={(event) => handleInputChange(event.target.value)}
+          onChange={(event) => onChange(event.target.value)}
           type={inputType}
           required={true}
         ></input>
       ) : (
         <input
           value={value}
-          onChange={(event) => handleInputChange(event.target.value)}
+          onChange={(event) => onChange(event.target.value)}
           type={inputType}
           required={true}
         ></input>

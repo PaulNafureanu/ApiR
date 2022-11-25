@@ -28,22 +28,20 @@ const RegistrationForm: React.FunctionComponent<RegistrationFormProps> = ({
           <InputField
             autoFocus={true}
             value={account.email}
-            handleInputChange={(value) => onChange(value, ["account", "email"])}
+            onChange={(value) => onChange(value, ["account", "email"])}
             spanValue="Enter Email"
             em={true}
           />
           <InputField
             value={account.password}
-            handleInputChange={(value) =>
-              onChange(value, ["account", "password"])
-            }
+            onChange={(value) => onChange(value, ["account", "password"])}
             spanValue="Enter Password"
             inputType="password"
           />
           <div className="inputPassFieldWrapper">
             <InputField
               value={account.repeatPassword}
-              handleInputChange={(value) =>
+              onChange={(value) =>
                 onChange(value, ["account", "repeatPassword"])
               }
               spanValue="Repeat Password"

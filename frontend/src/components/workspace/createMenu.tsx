@@ -91,7 +91,7 @@ const CreateMenu: React.FunctionComponent<CreateMenuProps> = ({
         <React.Fragment>
           <InputField
             value={newItemName}
-            handleInputChange={(value) => handleInputNameChange(value)}
+            onChange={(value) => handleInputNameChange(value)}
             spanValue={getCreateMenuText().inputSpanValue}
           />
           <div className="iconColor">

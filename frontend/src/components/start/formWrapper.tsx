@@ -3,9 +3,9 @@ import VanillaTilt, { TiltOptions } from "vanilla-tilt";
 import { AppState } from "../../App";
 import LoginForm from "./loginForm";
 import RegistrationForm from "./registrationForm";
-import "./../../css/TiltCard.css";
+import "./../../css/formWrapper.css";
 
-interface TiltProps {
+interface FormWrapperProps {
   options?: TiltOptions;
   cssId?: string;
   cssClass?: string;
@@ -13,7 +13,7 @@ interface TiltProps {
   onChange: (value: any, location: string[]) => void;
 }
 
-const FormWrapper: React.FunctionComponent<TiltProps> = ({
+const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
   options,
   cssId,
   cssClass = "Tilt",
@@ -23,6 +23,7 @@ const FormWrapper: React.FunctionComponent<TiltProps> = ({
   const tiltRef = React.createRef<HTMLDivElement>();
   const [showLogInMenu, setShowLogInMenu] = React.useState(true);
 
+  //The form tilt effect on the login/registration page
   React.useEffect(() => {
     VanillaTilt.init(tiltRef.current!);
   }, []);
