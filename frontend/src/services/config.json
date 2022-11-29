@@ -1,4 +1,5 @@
 {
-    "GoogleApiUrl": "http://127.0.0.1:8000/GoogleAPI/",
-    "AuthApiUrl": "http://127.0.0.1:8000/auth/"
+    "ServerApiEndpoint":"http://127.0.0.1:8000/",
+    "GoogleApiEndpoint": "http://127.0.0.1:8000/GoogleAPI/",
+    "AuthApiEndpoint": "http://127.0.0.1:8000/auth/"
 }

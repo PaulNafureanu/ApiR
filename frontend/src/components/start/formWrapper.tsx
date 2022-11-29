@@ -22,6 +22,7 @@ const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
 }) => {
   const tiltRef = React.createRef<HTMLDivElement>();
   const [showLogInMenu, setShowLogInMenu] = React.useState(true);
+  const { account } = appState;
 
   //The form tilt effect on the login/registration page
   React.useEffect(() => {
@@ -33,15 +34,23 @@ const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
       <div className="container">
         {showLogInMenu ? (
           <LoginForm
-            appState={appState}
+            data={{ email: account.email, password: account.password }}
+            errors={appState.errors}
             onChange={onChange}
-            setShowLogInMenu={(value) => setShowLogInMenu(value)}
+            isNotificationPossible={appState.isNotificationPossible}
+            setShowLogInMenu={(value: boolean) => setShowLogInMenu(value)}
           />
         ) : (
           <RegistrationForm
-            appState={appState}
+            data={{
+              email: account.email,
+              password: account.password,
+              repeatPassword: account.repeatPassword,
+            }}
+            errors={appState.errors}
             onChange={onChange}
-            setShowLogInMenu={(value) => setShowLogInMenu(value)}
+            isNotificationPossible={appState.isNotificationPossible}
+            setShowLogInMenu={(value: boolean) => setShowLogInMenu(value)}
           />
         )}
       </div>

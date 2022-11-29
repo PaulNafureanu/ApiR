@@ -1,5 +1,5 @@
-import axios from "axios";
-import url from "./config.json";
+import http from "./httpService";
+import config from "./config.json";
 
 export async function registerUser(email: string, password: string) {
   try {
@@ -8,7 +8,10 @@ export async function registerUser(email: string, password: string) {
       username: email.split("@")[0],
       password: password,
     };
-    const { data: response } = await axios.post(url.AuthApiUrl + "users/", obj);
+    const { data: response } = await http.post(
+      config.AuthApiEndpoint + "users/",
+      obj
+    );
 
     return loginUser(obj.email, obj.password);
   } catch (error) {
@@ -20,8 +23,8 @@ export async function registerUser(email: string, password: string) {
 export async function loginUser(email: string, password: string) {
   try {
     const obj = { username: email.split("@")[0], password: password };
-    const { data: response } = await axios.post(
-      url.AuthApiUrl + "jwt/create/",
+    const { data: response } = await http.post(
+      config.AuthApiEndpoint + "jwt/create/",
       obj
     );
 

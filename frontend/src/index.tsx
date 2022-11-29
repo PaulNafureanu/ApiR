@@ -1,14 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import "./index.css";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import keyListener from "./services/keyListenerService";
+import logger from "./services/logService";
+import App from "./App";
+import "./index.css";
 
-//Keyboard listener: TODO
-// window.addEventListener("keypress", (e) => {
-//   console.log(e);
-// });
+// keyListener.init();
+logger.init();
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

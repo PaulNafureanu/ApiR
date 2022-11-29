@@ -146,6 +146,11 @@
         align-items: center;
         height: 5.5rem;
         flex-direction: column;
+        .buttonWrapper {
+          display: flex;
+          justify-content: space-evenly;
+          flex-direction: column;
+        }
         button {
           cursor: url("./../../public/cursors/cur222.cur"), auto;
           background-color: #45f3ff;
@@ -170,6 +175,10 @@
             font-size: 1rem;
             outline: 1px solid white;
             transition: 0.2s;
+          }
+          &:disabled {
+            color: #45f3ff;
+            background-color: #1d2b3a;
           }
         }
         span {

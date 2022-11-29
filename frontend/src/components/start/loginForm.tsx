@@ -1,122 +1,76 @@
-import * as React from "react";
+import Form from "./form";
 import InputField from "./inputField";
-import { AppState } from "../../App";
+import Joi from "joi";
 import { loginUser } from "./../../services/userService";
 
 interface LoginFormProps {
-  appState: AppState;
+  data: {
+    email: string;
+    password: string;
+  };
+  errors: {};
+  isNotificationPossible: boolean;
   onChange: (value: any, location: string[]) => void;
   setShowLogInMenu: (log: boolean) => void;
 }
 
-const LoginForm: React.FunctionComponent<LoginFormProps> = ({
-  appState,
-  onChange,
-  setShowLogInMenu,
-}) => {
-  const account = appState.account;
+interface LoginFormState {
+  schema: Schema;
+}
 
-  function validate(): null | Object {
-    const errors: any = {};
+interface Schema {
+  email: Joi.StringSchema<string>;
+  password: Joi.StringSchema<string>;
+}
 
-    const { account } = appState;
+class LoginForm extends Form<LoginFormProps, LoginFormState> {
+  state = {
+    schema: {
+      email: Joi.string()
+        .email({ minDomainSegments: 2, tlds: { allow: ["com"] } })
+        .required()
+        .label("Email")
+        .regex(/gmail/i)
+        .message('"Email" should be a Google account (gmail)'),
+      password: Joi.string().min(5).max(30).required().label("Password"),
+    },
+  };
 
-    if (account.email.trim() === "") errors.email = "Email is required";
+  onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("Hello");
+  };
 
-    if (account.password.trim() === "")
-      errors.password = "Password is required";
-
-    return Object.keys(errors).length === 0 ? null : errors;
-  }
-
-  function validateProperty(name: string, value: string): null | string {
-    switch (name) {
-      case "email": {
-        if (value.trim() === "") return "Email is required";
-        break;
-      }
-      case "password": {
-        if (value.trim() === "") return "Password is required";
-        break;
-      }
-      default: {
-        return null;
-      }
-    }
-    return null;
-  }
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const errors = validate();
-    onChange(errors ? errors : {}, ["errors"]);
-    if (errors) return;
-
-    //Calling the backend
-    console.log("Submitted");
-  }
-
-  function handleChange(name: string, value: string) {
-    const errors: any = { ...appState.errors };
-    const errorMessage = validateProperty(name, value);
-    if (errorMessage) errors[name] = errorMessage;
-    else delete errors[name];
-
-    onChange(errors ? errors : {}, ["errors"]);
-    onChange(value, ["account", name]);
-  }
-
-  return (
-    <div className="form">
-      <header>
-        <h1 className="title">Log in</h1>
-      </header>
-      <form onSubmit={handleSubmit} noValidate>
-        <div className="inputFieldWrapper">
-          <InputField
-            autoFocus={true}
-            value={account.email}
-            onChange={(value) => handleChange("email", value)}
-            spanValue="Enter Email"
-            em={true}
-          />
-          <div className="inputPassFieldWrapper">
-            <InputField
-              value={account.password}
-              onChange={(value) => handleChange("password", value)}
-              spanValue="Enter Password"
-              inputType="password"
-            />
-            <div className="signUpOption">
-              <span className="forgetPasswordOption">Forget Password?</span>
-              <span
-                onClick={() => {
-                  setShowLogInMenu(false);
-                }}
-                className="signUpText"
-              >
-                Sign Up Here
-              </span>
+  render() {
+    const { email, password } = this.props.data;
+    const { setShowLogInMenu } = this.props;
+    return (
+      <div className="form">
+        <header>
+          <h1 className="title">Log in</h1>
+        </header>
+        <form onSubmit={this.handleSubmit.bind(this)} noValidate>
+          <div className="inputFieldWrapper">
+            {this.renderInput(email, "email", "text", true, true)}
+            <div className="inputPassFieldWrapper">
+              {this.renderInput(password, "password", "password")}
+              <div className="signUpOption">
+                <span className="forgetPasswordOption">Forget Password?</span>
+                <span
+                  onClick={() => {
+                    setShowLogInMenu(false);
+                  }}
+                  className="signUpText"
+                >
+                  Sign Up Here
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="buttonForm">
-          <button
-          // onClick={() => {
-          //   const prom = loginUser(account.email, account.password);
-          //   prom.then((value) => {
-          //     onChange(value, ["isUserLoggedIn"]);
-          //   });
-          // }}
-          >
-            Log Me In*
-          </button>
-          <span>*Authorize access to my Google Drive</span>
-        </div>
-      </form>
-    </div>
-  );
-};
+          {this.renderButton("Log Me In*")}
+        </form>
+      </div>
+    );
+  }
+}
 
 export default LoginForm;

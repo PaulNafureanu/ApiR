@@ -1,6 +1,8 @@
 import React from "react";
+import { ToastContainer } from "react-toastify";
 import Start from "./components/start/start";
 import WorkSpace from "./components/workspace/workspace";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
 export interface AppState {
@@ -12,6 +14,7 @@ export interface AppState {
   };
   errors: {};
   isUserLoggedIn: boolean;
+  isNotificationPossible: boolean;
 }
 
 function App() {
@@ -21,6 +24,7 @@ function App() {
     account: { username: "", email: "", password: "", repeatPassword: "" },
     errors: {},
     isUserLoggedIn: false,
+    isNotificationPossible: true,
   } as AppState);
 
   // App State Modification. Example of a call: handleStateChange("Leo", ["account", "username"]);
@@ -65,6 +69,19 @@ function App() {
 
   return (
     <div className="App">
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        limit={1}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       {appState.isUserLoggedIn ? (
         <WorkSpace />
       ) : (

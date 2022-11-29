@@ -1,82 +1,90 @@
-import * as React from "react";
+import Form from "./form";
 import InputField from "./inputField";
-import { AppState } from "../../App";
+import Joi from "joi";
 import { registerUser } from "./../../services/userService";
 
 interface RegistrationFormProps {
-  appState: AppState;
+  data: {
+    email: string;
+    password: string;
+    repeatPassword: string;
+  };
+  errors: {};
+  isNotificationPossible: boolean;
   onChange: (value: any, location: string[]) => void;
   setShowLogInMenu: (log: boolean) => void;
 }
 
-const RegistrationForm: React.FunctionComponent<RegistrationFormProps> = ({
-  appState,
-  onChange,
-  setShowLogInMenu,
-}) => {
-  const account = appState.account;
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-  }
-  return (
-    <div className="form">
-      <header>
-        <div className="title">Sign Up</div>
-      </header>
-      <form onSubmit={handleSubmit}>
-        <div className="inputFieldWrapper">
-          <InputField
-            autoFocus={true}
-            value={account.email}
-            onChange={(value) => onChange(value, ["account", "email"])}
-            spanValue="Enter Email"
-            em={true}
-          />
-          <InputField
-            value={account.password}
-            onChange={(value) => onChange(value, ["account", "password"])}
-            spanValue="Enter Password"
-            inputType="password"
-          />
-          <div className="inputPassFieldWrapper">
-            <InputField
-              value={account.repeatPassword}
-              onChange={(value) =>
-                onChange(value, ["account", "repeatPassword"])
-              }
-              spanValue="Repeat Password"
-              inputType="password"
-            />
-            <div className="logInOption">
-              <span className="accountQuestion">Do you have an account?</span>
-              <span
-                onClick={() => {
-                  setShowLogInMenu(true);
-                }}
-                className="logInText"
-              >
-                {" "}
-                Log In Here
-              </span>
+interface RegistrationFormState {
+  schema: Schema;
+}
+
+interface Schema {
+  email: Joi.StringSchema<string>;
+  password: Joi.StringSchema<string>;
+  repeatPassword: Joi.StringSchema<string>;
+}
+
+class RegistrationForm extends Form<
+  RegistrationFormProps,
+  RegistrationFormState
+> {
+  state = {
+    schema: {
+      email: Joi.string()
+        .email({ minDomainSegments: 2, tlds: { allow: ["com"] } })
+        .required()
+        .label("Email")
+        .regex(/gmail/i)
+        .message('"Email" should be a Google account (gmail)'),
+      password: Joi.string().min(5).max(30).required().label("Password"),
+      repeatPassword: Joi.string()
+        .required()
+        .label("Repeat password")
+        .valid(Joi.ref("password"))
+        .messages({
+          "any.only": '"Repeat password" should be identical with password',
+        }),
+    },
+  };
+
+  onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("Submitted");
+  };
+
+  render() {
+    const { email, password, repeatPassword } = this.props.data;
+    const { setShowLogInMenu, onChange } = this.props;
+    return (
+      <div className="form">
+        <header>
+          <div className="title">Sign Up</div>
+        </header>
+        <form onSubmit={this.handleSubmit.bind(this)}>
+          <div className="inputFieldWrapper">
+            {this.renderInput(email, "email", "text", true, true)}
+            {this.renderInput(password, "password", "password")}
+            <div className="inputPassFieldWrapper">
+              {this.renderInput(repeatPassword, "repeatPassword", "password")}
+              <div className="logInOption">
+                <span className="accountQuestion">Do you have an account?</span>
+                <span
+                  onClick={() => {
+                    setShowLogInMenu(true);
+                  }}
+                  className="logInText"
+                >
+                  {" "}
+                  Log In Here
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="buttonForm">
-          <button
-            onClick={() => {
-              const prom = registerUser(account.email, account.password);
-              prom.then((value) => {
-                onChange(value, ["isUserLoggedIn"]);
-              });
-            }}
-          >
-            Sign Me Up*
-          </button>
-          <span>*Authorize access to my Google Drive</span>
-        </div>
-      </form>
-    </div>
-  );
-};
+          {this.renderButton("Sign Me Up")}
+        </form>
+      </div>
+    );
+  }
+}
 
 export default RegistrationForm;
