@@ -1,46 +1,49 @@
 import * as React from "react";
-import VanillaTilt, { TiltOptions } from "vanilla-tilt";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { AppState } from "../../App";
+import vfx from "./../../services/vfxService";
 import LoginForm from "./loginForm";
 import RegistrationForm from "./registrationForm";
+import ResetPasswordForm from "./resetPassword";
+import SetNewPasswordForm from "./setNewPassword";
 import "./../../css/formWrapper.css";
 
 interface FormWrapperProps {
-  options?: TiltOptions;
-  cssId?: string;
-  cssClass?: string;
   appState: AppState;
   onChange: (value: any, location: string[]) => void;
 }
 
 const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
-  options,
-  cssId,
-  cssClass = "Tilt",
   appState,
   onChange,
 }) => {
   const tiltRef = React.createRef<HTMLDivElement>();
-  const [showLogInMenu, setShowLogInMenu] = React.useState(true);
   const { account } = appState;
 
   //The form tilt effect on the login/registration page
   React.useEffect(() => {
-    VanillaTilt.init(tiltRef.current!);
+    vfx.useTiltVFX(tiltRef);
   }, []);
 
-  return (
-    <div id={cssId} className={cssClass} ref={tiltRef} {...options}>
-      <div className="container">
-        {showLogInMenu ? (
+  const { id } = useParams();
+  const navigator = useNavigate();
+
+  function renderForm(id: any) {
+    switch (id) {
+      case "log-in": {
+        return (
           <LoginForm
             data={{ email: account.email, password: account.password }}
             errors={appState.errors}
             onChange={onChange}
+            navigator={navigator}
             isNotificationPossible={appState.isNotificationPossible}
-            setShowLogInMenu={(value: boolean) => setShowLogInMenu(value)}
           />
-        ) : (
+        );
+      }
+
+      case "sign-up": {
+        return (
           <RegistrationForm
             data={{
               email: account.email,
@@ -49,11 +52,48 @@ const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
             }}
             errors={appState.errors}
             onChange={onChange}
+            navigator={navigator}
             isNotificationPossible={appState.isNotificationPossible}
-            setShowLogInMenu={(value: boolean) => setShowLogInMenu(value)}
           />
-        )}
-      </div>
+        );
+      }
+      case "reset-password": {
+        return (
+          <ResetPasswordForm
+            data={{
+              email: account.email,
+            }}
+            errors={appState.errors}
+            onChange={onChange}
+            navigator={navigator}
+            isNotificationPossible={appState.isNotificationPossible}
+          />
+        );
+      }
+      case "set-new-password": {
+        //Needs to be protected somehow
+        return (
+          <SetNewPasswordForm
+            data={{
+              password: account.password,
+              repeatPassword: account.repeatPassword,
+            }}
+            errors={appState.errors}
+            onChange={onChange}
+            navigator={navigator}
+            isNotificationPossible={appState.isNotificationPossible}
+          />
+        );
+      }
+      default: {
+        return <Navigate to="/not-found" />;
+      }
+    }
+  }
+
+  return (
+    <div className={"Tilt"} ref={tiltRef} {...vfx.tiltOptions}>
+      <div className="container">{renderForm(id)}</div>
     </div>
   );
 };

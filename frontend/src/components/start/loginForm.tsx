@@ -1,7 +1,8 @@
 import Form from "./form";
 import InputField from "./inputField";
+import userService from "./../../services/userService";
 import Joi from "joi";
-import { loginUser } from "./../../services/userService";
+import { Link, NavigateFunction } from "react-router-dom";
 
 interface LoginFormProps {
   data: {
@@ -11,11 +12,12 @@ interface LoginFormProps {
   errors: {};
   isNotificationPossible: boolean;
   onChange: (value: any, location: string[]) => void;
-  setShowLogInMenu: (log: boolean) => void;
+  navigator: NavigateFunction;
 }
 
 interface LoginFormState {
   schema: Schema;
+  showAuthText: boolean;
 }
 
 interface Schema {
@@ -32,17 +34,28 @@ class LoginForm extends Form<LoginFormProps, LoginFormState> {
         .label("Email")
         .regex(/gmail/i)
         .message('"Email" should be a Google account (gmail)'),
-      password: Joi.string().min(5).max(30).required().label("Password"),
+      password: Joi.string()
+        .alphanum()
+        .min(5)
+        .max(30)
+        .required()
+        .label("Password"),
     },
+
+    showAuthText: true,
   };
 
-  onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("Hello");
+  onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const { email, password } = this.props.data;
+    const responseCreateJWT = await userService.createJWT(email, password);
+    if (responseCreateJWT) {
+      this.props.onChange(true, ["isUserLoggedIn"]);
+      this.props.navigator("/workspace");
+    }
   };
 
   render() {
     const { email, password } = this.props.data;
-    const { setShowLogInMenu } = this.props;
     return (
       <div className="form">
         <header>
@@ -50,19 +63,28 @@ class LoginForm extends Form<LoginFormProps, LoginFormState> {
         </header>
         <form onSubmit={this.handleSubmit.bind(this)} noValidate>
           <div className="inputFieldWrapper">
-            {this.renderInput(email, "email", "text", true, true)}
+            {this.renderInput(
+              email,
+              "email",
+              "Enter Email",
+              "text",
+              true,
+              true
+            )}
             <div className="inputPassFieldWrapper">
-              {this.renderInput(password, "password", "password")}
+              {this.renderInput(
+                password,
+                "password",
+                "Enter Password",
+                "password"
+              )}
               <div className="signUpOption">
-                <span className="forgetPasswordOption">Forget Password?</span>
-                <span
-                  onClick={() => {
-                    setShowLogInMenu(false);
-                  }}
-                  className="signUpText"
-                >
+                <Link className="forgetPasswordOption" to="/reset-password">
+                  Forget Password?
+                </Link>
+                <Link className="signUpText" to="/sign-up">
                   Sign Up Here
-                </span>
+                </Link>
               </div>
             </div>
           </div>

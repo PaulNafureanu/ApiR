@@ -1,7 +1,7 @@
 import Form from "./form";
-import InputField from "./inputField";
 import Joi from "joi";
-import { registerUser } from "./../../services/userService";
+import { Link, NavigateFunction } from "react-router-dom";
+import userService from "./../../services/userService";
 
 interface RegistrationFormProps {
   data: {
@@ -12,11 +12,12 @@ interface RegistrationFormProps {
   errors: {};
   isNotificationPossible: boolean;
   onChange: (value: any, location: string[]) => void;
-  setShowLogInMenu: (log: boolean) => void;
+  navigator: NavigateFunction;
 }
 
 interface RegistrationFormState {
   schema: Schema;
+  showAuthText: boolean;
 }
 
 interface Schema {
@@ -37,24 +38,37 @@ class RegistrationForm extends Form<
         .label("Email")
         .regex(/gmail/i)
         .message('"Email" should be a Google account (gmail)'),
-      password: Joi.string().min(5).max(30).required().label("Password"),
+      password: Joi.string()
+        .alphanum()
+        .min(8)
+        .max(30)
+        .required()
+        .label("Password"),
       repeatPassword: Joi.string()
         .required()
-        .label("Repeat password")
+        .label("Confirm password")
         .valid(Joi.ref("password"))
         .messages({
-          "any.only": '"Repeat password" should be identical with password',
+          "any.only": '"Confirm password" should be identical with password',
         }),
     },
+    showAuthText: true,
   };
 
-  onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("Submitted");
+  onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const { email, password } = this.props.data;
+    let responseCreateUser = await userService.createUser(email, password);
+    if (responseCreateUser) {
+      const responseCreateJWT = await userService.createJWT(email, password);
+      if (responseCreateJWT) {
+        this.props.onChange(true, ["isUserLoggedIn"]);
+        this.props.navigator("/workspace");
+      }
+    }
   };
 
   render() {
     const { email, password, repeatPassword } = this.props.data;
-    const { setShowLogInMenu, onChange } = this.props;
     return (
       <div className="form">
         <header>
@@ -62,21 +76,32 @@ class RegistrationForm extends Form<
         </header>
         <form onSubmit={this.handleSubmit.bind(this)}>
           <div className="inputFieldWrapper">
-            {this.renderInput(email, "email", "text", true, true)}
-            {this.renderInput(password, "password", "password")}
+            {this.renderInput(
+              email,
+              "email",
+              "Enter Email",
+              "text",
+              true,
+              true
+            )}
+            {this.renderInput(
+              password,
+              "password",
+              "Enter Password",
+              "password"
+            )}
             <div className="inputPassFieldWrapper">
-              {this.renderInput(repeatPassword, "repeatPassword", "password")}
+              {this.renderInput(
+                repeatPassword,
+                "repeatPassword",
+                "Confirm Password",
+                "password"
+              )}
               <div className="logInOption">
                 <span className="accountQuestion">Do you have an account?</span>
-                <span
-                  onClick={() => {
-                    setShowLogInMenu(true);
-                  }}
-                  className="logInText"
-                >
-                  {" "}
+                <Link className="logInText" to="/log-in">
                   Log In Here
-                </span>
+                </Link>
               </div>
             </div>
           </div>

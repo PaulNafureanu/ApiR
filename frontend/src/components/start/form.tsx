@@ -12,6 +12,7 @@ interface FormProps {
 
 interface FormState {
   schema: {};
+  showAuthText: boolean;
 }
 
 class Form<
@@ -93,19 +94,13 @@ class Form<
             }
           }}
         >
-          <button
-            disabled={this.validate() ? true : false}
-            // onClick={() => {
-            //   const prom = loginUser(account.email, account.password);
-            //   prom.then((value) => {
-            //     onChange(value, ["isUserLoggedIn"]);
-            //   });
-            // }}
-          >
-            {label}
-          </button>
+          <button disabled={this.validate() ? true : false}>{label}</button>
         </div>
-        <span>*Authorize access to my Google Drive</span>
+        <span>
+          {this.state.showAuthText
+            ? "*Authorize access to my Google Drive"
+            : ""}
+        </span>
       </div>
     );
   }
@@ -113,6 +108,7 @@ class Form<
   renderInput(
     value: string,
     label: string,
+    spanValue: string,
     inputType = "text",
     autoFocus = false,
     em = false
@@ -122,7 +118,7 @@ class Form<
         autoFocus={autoFocus}
         value={value}
         onChange={(v) => this.handleChange(label, v)}
-        spanValue={"Enter " + label.toUpperCase()}
+        spanValue={spanValue}
         em={em}
         inputType={inputType}
       />
