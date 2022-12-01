@@ -7,6 +7,8 @@ import RegistrationForm from "./registrationForm";
 import ResetPasswordForm from "./resetPassword";
 import SetNewPasswordForm from "./setNewPassword";
 import "./../../css/formWrapper.css";
+import PageBeforeActivation from "./pageBeforeActivation";
+import ActivationPage from "./activationPage";
 
 interface FormWrapperProps {
   appState: AppState;
@@ -57,6 +59,16 @@ const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
           />
         );
       }
+      case "registration-sent": {
+        return appState.isRegistrationSent ? (
+          <PageBeforeActivation data={{ email: account.email }} />
+        ) : (
+          <Navigate to="/sign-up" />
+        );
+      }
+      case "account-activation": {
+        return <ActivationPage onChange={onChange} navigator={navigator} />;
+      }
       case "reset-password": {
         return (
           <ResetPasswordForm
@@ -71,19 +83,20 @@ const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
         );
       }
       case "set-new-password": {
-        //Needs to be protected somehow
-        return (
-          <SetNewPasswordForm
-            data={{
-              password: account.password,
-              repeatPassword: account.repeatPassword,
-            }}
-            errors={appState.errors}
-            onChange={onChange}
-            navigator={navigator}
-            isNotificationPossible={appState.isNotificationPossible}
-          />
-        );
+        if (appState.isSettingNewPassword) {
+          return (
+            <SetNewPasswordForm
+              data={{
+                password: account.password,
+                repeatPassword: account.repeatPassword,
+              }}
+              errors={appState.errors}
+              onChange={onChange}
+              navigator={navigator}
+              isNotificationPossible={appState.isNotificationPossible}
+            />
+          );
+        } else return <Navigate to="/reset-password" />;
       }
       default: {
         return <Navigate to="/not-found" />;

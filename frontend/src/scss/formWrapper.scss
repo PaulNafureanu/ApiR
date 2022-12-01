@@ -77,7 +77,8 @@
         text-align: center;
       }
     }
-    form {
+    form,
+    div.form {
       width: 100%;
       height: 100%;
       .inputFieldWrapper {
@@ -88,6 +89,23 @@
         align-items: center;
         gap: 2rem;
         flex-direction: column;
+
+        p {
+          text-align: center;
+          font-size: 0.9rem;
+          text-indent: 1rem;
+          line-height: 1.5rem;
+          color: #fffd;
+          width: 80%;
+        }
+        p.sup {
+          font-size: 1rem;
+        }
+
+        p.sub {
+          font-size: 0.8rem;
+        }
+
         div.inputPassFieldWrapper {
           width: 20rem;
           height: fit-content;
@@ -131,11 +149,6 @@
               font-size: 0.9rem;
             }
           }
-
-          // .lgnIn {
-          //   color: #45f3ff;
-          //   cursor: url("./../../public/cursors/cur222.cur"), auto;
-          // }
         }
       }
       .buttonForm {

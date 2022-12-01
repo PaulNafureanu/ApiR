@@ -16,8 +16,12 @@ import CreateMenu from "./createMenu";
 import "./../../css/workspace.css";
 import "./../../css/utils.css";
 import structuredClone from "@ungap/structured-clone";
+import { AppState } from "./../../App";
 
-interface WorkSpaceProps {}
+interface WorkSpaceProps {
+  appState: AppState;
+  onChange: (value: any, location: string[]) => void;
+}
 
 const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
   /**States */

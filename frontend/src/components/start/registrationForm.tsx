@@ -59,11 +59,9 @@ class RegistrationForm extends Form<
     const { email, password } = this.props.data;
     let responseCreateUser = await userService.createUser(email, password);
     if (responseCreateUser) {
-      const responseCreateJWT = await userService.createJWT(email, password);
-      if (responseCreateJWT) {
-        this.props.onChange(true, ["isUserLoggedIn"]);
-        this.props.navigator("/workspace");
-      }
+      localStorage.setItem("receiveActivationEmail", "true");
+      this.props.onChange(true, ["isRegistrationSent"]);
+      this.props.navigator("/registration-sent");
     }
   };
 

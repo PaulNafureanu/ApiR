@@ -1,10 +1,11 @@
 import React from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import Start from "./components/start/start";
 import WorkSpace from "./components/workspace/workspace";
 import PageNotFound from "./components/pageNotFound";
 import notifier from "./services/notificationService";
 import "./App.css";
+import ProtectedRoute from "./components/protectedRoute";
 
 export interface AppState {
   account: {
@@ -14,6 +15,8 @@ export interface AppState {
     repeatPassword: string;
   };
   errors: {};
+  isRegistrationSent: boolean;
+  isSettingNewPassword: boolean;
   isUserLoggedIn: boolean;
   isNotificationPossible: boolean;
 }
@@ -24,6 +27,8 @@ function App() {
   const [appState, setAppState] = React.useState({
     account: { username: "", email: "", password: "", repeatPassword: "" },
     errors: {},
+    isRegistrationSent: false,
+    isSettingNewPassword: false,
     isUserLoggedIn: false,
     isNotificationPossible: true,
   } as AppState);
@@ -68,27 +73,28 @@ function App() {
     }
   }
 
+  //Render (protected) routes
+  const renderCurrentElement = (
+    <ProtectedRoute
+      appState={appState}
+      element={
+        useLocation().pathname === "/workspace" ? (
+          <WorkSpace appState={appState} onChange={handleStateChange} />
+        ) : (
+          <Start appState={appState} onChange={handleStateChange} />
+        )
+      }
+    />
+  );
+
   return (
     <div className="App">
       {notifier.init()}
       <Routes>
+        <Route index element={<Navigate to={"/log-in"} />} />
         <Route path="/">
-          <Route index element={<Navigate to={"/log-in"} />} />
-          <Route
-            path=":id"
-            element={<Start appState={appState} onChange={handleStateChange} />}
-          />
+          <Route path=":id" element={renderCurrentElement} />
         </Route>
-        <Route
-          path="/workspace"
-          element={
-            appState.isUserLoggedIn ? (
-              <WorkSpace />
-            ) : (
-              <Navigate to={"/log-in"} />
-            )
-          }
-        />
         <Route path="/not-found" element={<PageNotFound />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
