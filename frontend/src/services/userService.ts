@@ -166,6 +166,23 @@ async function resetPassword(email: string) {
   }
 }
 
+async function setNewPassword(uid: string, token: string, password: string) {
+  try {
+    const obj = { uid: uid, token: token, password: password };
+    const { data: response } = await http.post(
+      config.AuthApiEndpoint + "users/reset_password_confirm/",
+      obj
+    );
+    return true;
+  } catch (error: any) {
+    if (error.response && error.response.status === 400) {
+      logger.log(error);
+      notifier.warn("Something went wrong, try again later.");
+    }
+    return false;
+  }
+}
+
 export default {
   createUser,
   activateUser,
@@ -174,4 +191,5 @@ export default {
   refreshJWT,
   verifyJWT,
   resetPassword,
+  setNewPassword,
 };

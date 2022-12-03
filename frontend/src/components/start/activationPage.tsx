@@ -22,7 +22,6 @@ const ActivationPage: React.FunctionComponent<ActivationPageProps> = ({
       const responseActivateUser = await userService.activateUser(uid, token);
       if (responseActivateUser) {
         localStorage.removeItem("receiveActivationEmail");
-        onChange(true, ["isEmailActivated"]);
         navigator("/log-in");
       }
     }

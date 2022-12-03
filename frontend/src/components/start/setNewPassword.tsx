@@ -1,6 +1,7 @@
 import Joi from "joi";
 import Form from "./form";
-import { NavigateFunction } from "react-router-dom";
+import { NavigateFunction, useLocation } from "react-router-dom";
+import userService from "../../services/userService";
 
 interface SetNewPasswordFormProps {
   data: {
@@ -46,8 +47,22 @@ class SetNewPasswordForm extends Form<
     showAuthText: false,
   };
 
-  onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("Send");
+  onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    let location = useLocation();
+    const { password } = this.props.data;
+    const { onChange, navigator } = this.props;
+    const hashes = location.hash.split("/");
+    const uid = hashes[1];
+    const token = hashes[2];
+    const responseSetNewPassword = await userService.setNewPassword(
+      uid,
+      token,
+      password
+    );
+    if (responseSetNewPassword) {
+      localStorage.removeItem("receiveActivationEmail");
+      navigator("/log-in");
+    }
   };
 
   render() {

@@ -34,6 +34,11 @@ const ProtectedRoute: React.FunctionComponent<ProtectedRouteProps> = ({
       alternativePath = "/sign-up";
       break;
     }
+    case "password-reset-sent": {
+      condition = appState["isSettingNewPassword"];
+      alternativePath = "/reset-password";
+      break;
+    }
     case "account-activation": {
       let receiveActivationEmail = localStorage.getItem(
         "receiveActivationEmail"
@@ -43,7 +48,10 @@ const ProtectedRoute: React.FunctionComponent<ProtectedRouteProps> = ({
       break;
     }
     case "set-new-password": {
-      condition = appState["isSettingNewPassword"];
+      let receivePasswordResetEmail = localStorage.getItem(
+        "receivePasswordResetEmail"
+      );
+      condition = receivePasswordResetEmail === "true";
       alternativePath = "/reset-password";
       break;
     }

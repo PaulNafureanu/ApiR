@@ -6,9 +6,10 @@ import LoginForm from "./loginForm";
 import RegistrationForm from "./registrationForm";
 import ResetPasswordForm from "./resetPassword";
 import SetNewPasswordForm from "./setNewPassword";
-import "./../../css/formWrapper.css";
 import PageBeforeActivation from "./pageBeforeActivation";
 import ActivationPage from "./activationPage";
+import "./../../css/formWrapper.css";
+import PageBeforePassReset from "./pageBeforePassReset";
 
 interface FormWrapperProps {
   appState: AppState;
@@ -66,6 +67,13 @@ const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
           <Navigate to="/sign-up" />
         );
       }
+      case "password-reset-sent": {
+        return appState.isSettingNewPassword ? (
+          <PageBeforePassReset data={{ email: account.email }} />
+        ) : (
+          <Navigate to="/reset-password" />
+        );
+      }
       case "account-activation": {
         return <ActivationPage onChange={onChange} navigator={navigator} />;
       }
@@ -83,20 +91,18 @@ const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
         );
       }
       case "set-new-password": {
-        if (appState.isSettingNewPassword) {
-          return (
-            <SetNewPasswordForm
-              data={{
-                password: account.password,
-                repeatPassword: account.repeatPassword,
-              }}
-              errors={appState.errors}
-              onChange={onChange}
-              navigator={navigator}
-              isNotificationPossible={appState.isNotificationPossible}
-            />
-          );
-        } else return <Navigate to="/reset-password" />;
+        return (
+          <SetNewPasswordForm
+            data={{
+              password: account.password,
+              repeatPassword: account.repeatPassword,
+            }}
+            errors={appState.errors}
+            onChange={onChange}
+            navigator={navigator}
+            isNotificationPossible={appState.isNotificationPossible}
+          />
+        );
       }
       default: {
         return <Navigate to="/not-found" />;

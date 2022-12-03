@@ -42,7 +42,9 @@ class ResetPasswordForm extends Form<
     const { email } = this.props.data;
     const responseResetPass = await userService.resetPassword(email);
     if (responseResetPass) {
-      this.props.navigator("/set-new-password");
+      localStorage.setItem("receivePasswordResetEmail", "true");
+      this.props.onChange(true, ["isSettingNewPassword"]);
+      this.props.navigator("/password-reset-sent");
     }
   };
 

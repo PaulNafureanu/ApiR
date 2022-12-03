@@ -150,8 +150,7 @@ DOMAIN = 'localhost:3000'  # example.com
 SITE_NAME = 'localhost:3000'  # Example
 
 DJOSER = {
-    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'set-new-password/#/{uid}/{token}',
     'ACTIVATION_URL': 'account-activation/#/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {},
