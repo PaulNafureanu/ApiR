@@ -18,10 +18,7 @@ import "./../../css/utils.css";
 import structuredClone from "@ungap/structured-clone";
 import { AppState } from "./../../App";
 
-interface WorkSpaceProps {
-  appState: AppState;
-  onChange: (value: any, location: string[]) => void;
-}
+interface WorkSpaceProps {}
 
 const WorkSpace: React.FunctionComponent<WorkSpaceProps> = () => {
   /**States */

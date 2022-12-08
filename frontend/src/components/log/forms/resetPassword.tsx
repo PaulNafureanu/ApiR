@@ -1,55 +1,55 @@
-import Joi from "joi";
-import Form from "./form";
-import { Link, NavigateFunction } from "react-router-dom";
-import userService from "./../../services/userService";
+import { Link, useNavigate } from "react-router-dom";
+import Form from "./../common/form";
+import userService from "../../../services/userService";
+import { IFormProps, Email, SchemaEmail } from "./../common/form";
 
 interface ResetPasswordFormProps {
-  data: {
-    email: string;
-  };
-  errors: {};
-  isNotificationPossible: boolean;
-  onChange: (value: any, location: string[]) => void;
-  navigator: NavigateFunction;
+  formProps: IFormProps<Email, SchemaEmail>;
 }
 
 interface ResetPasswordFormState {
-  schema: Schema;
-  showAuthText: boolean;
-}
-
-interface Schema {
-  email: Joi.StringSchema<string>;
+  showGoogleAuthText: boolean;
 }
 
 class ResetPasswordForm extends Form<
+  Email,
+  SchemaEmail,
   ResetPasswordFormProps,
   ResetPasswordFormState
 > {
   state = {
-    schema: {
-      email: Joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ["com"] } })
-        .required()
-        .label("Email")
-        .regex(/gmail/i)
-        .message('"Email" should be a Google account (gmail)'),
-    },
-    showAuthText: false,
+    showGoogleAuthText: false,
+  };
+
+  specificState = (): { data: Email; schema: SchemaEmail } => {
+    return {
+      data: { email: this.props.formProps.globalData.email },
+      schema: { email: this.props.formProps.globalSchema.email },
+    };
   };
 
   onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const { email } = this.props.data;
+    const { email } = this.props.formProps.globalData;
+    const { navigator } = this.props.formProps;
+    setTimeout(() => {
+      this.props.formProps.onChange(true, [
+        "flags",
+        "isPasswordResetEmailSent",
+      ]);
+      navigator("/send-password-reset-email-link");
+    }, 500);
     const responseResetPass = await userService.resetPassword(email);
-    if (responseResetPass) {
-      localStorage.setItem("receivePasswordResetEmail", "true");
-      this.props.onChange(true, ["isSettingNewPassword"]);
-      this.props.navigator("/password-reset-sent");
+    if (!responseResetPass) {
+      this.props.formProps.onChange(false, [
+        "flags",
+        "isPasswordResetEmailSent",
+      ]);
+      navigator("/reset-password");
     }
   };
 
   render() {
-    const { email } = this.props.data;
+    const { email } = this.props.formProps.globalData;
     return (
       <div className="form">
         <header>

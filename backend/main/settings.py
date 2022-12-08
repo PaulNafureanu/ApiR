@@ -151,7 +151,7 @@ SITE_NAME = 'localhost:3000'  # Example
 
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': 'set-new-password/#/{uid}/{token}',
-    'ACTIVATION_URL': 'account-activation/#/{uid}/{token}',
+    'ACTIVATION_URL': 'confirm-activation/#/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {},
 }

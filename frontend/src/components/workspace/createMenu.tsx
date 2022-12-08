@@ -1,6 +1,6 @@
 import * as React from "react";
 import { MethodsSupported } from "../../scripts/UserProject";
-import InputField from "../start/inputField";
+import InputField from "../log/common/input";
 import "./../../css/createMenu.css";
 import "./../../css/utils.css";
 

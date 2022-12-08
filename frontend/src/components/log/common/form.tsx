@@ -1,28 +1,88 @@
 import * as React from "react";
-import notifier from "./../../services/notificationService";
 import Joi from "joi";
-import InputField from "./inputField";
+import { Location, NavigateFunction } from "react-router-dom";
+import Input from "./input";
+import notifier from "./../../../services/notificationService";
 
-interface FormProps {
-  data: {};
+export interface Email {
+  email: string;
+}
+export interface Password {
+  password: string;
+}
+export interface EmailPassword {
+  email: string;
+  password: string;
+}
+export interface PasswordRepeatPassword {
+  password: string;
+  repeatPassword: string;
+}
+export interface EmailPasswordRepeatPassword {
+  email: string;
+  password: string;
+  repeatPassword: string;
+}
+export interface SchemaEmail {
+  email: Joi.StringSchema<string>;
+}
+export interface SchemaPassword {
+  password: Joi.StringSchema<string>;
+}
+export interface SchemaEmailPassword {
+  email: Joi.StringSchema<string>;
+  password: Joi.StringSchema<string>;
+}
+export interface SchemaPasswordRepeatPassword {
+  password: Joi.StringSchema<string>;
+  repeatPassword: Joi.StringSchema<string>;
+}
+export interface SchemaEmailPasswordRepeatPassword {
+  email: Joi.StringSchema<string>;
+  password: Joi.StringSchema<string>;
+  repeatPassword: Joi.StringSchema<string>;
+}
+
+export interface IFormProps<Type extends Object, SchemaType extends Object> {
+  globalData: Type;
+  globalSchema: SchemaType;
   errors: {};
-  isNotificationPossible: boolean;
+  flags: {
+    isNotificationPossible: boolean;
+    isActivationEmailSent: boolean;
+    isPasswordResetEmailSent: boolean;
+    isPasswordResetConfirmed: boolean;
+    shouldSignUpAgain: boolean;
+  };
+  navigator: NavigateFunction;
+  locator: Location;
   onChange: (value: any, location: string[]) => void;
 }
 
+interface FormProps<Type extends Object, SchemaType extends Object> {
+  formProps: IFormProps<Type, SchemaType>;
+}
+
 interface FormState {
-  schema: {};
-  showAuthText: boolean;
+  showGoogleAuthText: boolean;
 }
 
 class Form<
-  ExtendedFormProps extends FormProps,
+  FormType extends Object,
+  SchemaType extends Object,
+  ExtendedFormProps extends FormProps<FormType, SchemaType>,
   ExtendedFormState extends FormState
 > extends React.Component<ExtendedFormProps, ExtendedFormState> {
+  specificState = (): { data: FormType; schema: SchemaType } => {
+    return {
+      data: this.props.formProps.globalData,
+      schema: this.props.formProps.globalSchema,
+    };
+  };
+
   validate(): null | Object {
     const errors: any = {};
-    const { data } = this.props;
-    const { schema } = this.state;
+    const { data, schema } = this.specificState();
     const options = { abortEarly: false };
     const { error } = Joi.object(schema).validate(data, options);
     if (!error) return null;
@@ -31,7 +91,7 @@ class Form<
   }
 
   validateProperty(name: string, value: string): null | string {
-    const schema: any = this.state.schema;
+    const schema: any = this.specificState().schema;
     const object = { [name]: value };
     const schemaProp = { [name]: schema[name] };
     const { error } = Joi.object(schemaProp).validate(object);
@@ -40,7 +100,7 @@ class Form<
 
   handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const { onChange } = this.props;
+    const { onChange } = this.props.formProps;
     const errors = this.validate();
     onChange(errors ? errors : {}, ["errors"]);
 
@@ -53,8 +113,8 @@ class Form<
   };
 
   handleChange(name: string, value: string) {
-    const { onChange } = this.props;
-    const errors: any = { ...this.props.errors };
+    const { onChange } = this.props.formProps;
+    const errors: any = { ...this.props.formProps.errors };
     const errorMessage = this.validateProperty(name, value);
     if (errorMessage) errors[name] = errorMessage;
     else delete errors[name];
@@ -64,7 +124,7 @@ class Form<
 
   handleNotificationActivation() {
     setTimeout(() => {
-      this.props.onChange(true, ["isNotificationPossible"]);
+      this.props.formProps.onChange(true, ["flags", "isNotificationPossible"]);
     }, 5000);
   }
 
@@ -74,7 +134,7 @@ class Form<
         <div
           className="buttonWrapper"
           onMouseEnter={() => {
-            if (this.props.isNotificationPossible) {
+            if (this.props.formProps.flags.isNotificationPossible) {
               const errors: any = this.validate();
               if (errors) {
                 let errorMessage: string = "";
@@ -87,8 +147,10 @@ class Form<
                 errorMessage = errors["email"] ? errors["email"] : errorMessage;
 
                 notifier.info(errorMessage);
-
-                this.props.onChange(false, ["isNotificationPossible"]);
+                this.props.formProps.onChange(false, [
+                  "flags",
+                  "isNotificationPossible",
+                ]);
                 this.handleNotificationActivation();
               }
             }
@@ -97,7 +159,7 @@ class Form<
           <button disabled={this.validate() ? true : false}>{label}</button>
         </div>
         <span>
-          {this.state.showAuthText
+          {this.state.showGoogleAuthText
             ? "*Authorize access to my Google Drive"
             : ""}
         </span>
@@ -114,7 +176,7 @@ class Form<
     em = false
   ) {
     return (
-      <InputField
+      <Input
         autoFocus={autoFocus}
         value={value}
         onChange={(v) => this.handleChange(label, v)}

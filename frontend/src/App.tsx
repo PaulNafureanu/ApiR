@@ -1,36 +1,19 @@
 import React from "react";
-import { Route, Routes, Navigate, useLocation } from "react-router-dom";
-import Start from "./components/start/start";
-import WorkSpace from "./components/workspace/workspace";
-import PageNotFound from "./components/pageNotFound";
+import { Route, Routes, Navigate } from "react-router-dom";
+import Start from "./components/log/start";
 import notifier from "./services/notificationService";
 import "./App.css";
-import ProtectedRoute from "./components/protectedRoute";
+import Workspace from "./components/workspace/workspace";
 
 export interface AppState {
-  account: {
-    username: string;
-    email: string;
-    password: string;
-    repeatPassword: string;
-  };
-  errors: {};
-  isRegistrationSent: boolean;
-  isSettingNewPassword: boolean;
   isUserLoggedIn: boolean;
-  isNotificationPossible: boolean;
 }
 
 function App() {
   //State for the main interactions of the user with the app
 
   const [appState, setAppState] = React.useState({
-    account: { username: "", email: "", password: "", repeatPassword: "" },
-    errors: {},
-    isRegistrationSent: false,
-    isSettingNewPassword: false,
     isUserLoggedIn: false,
-    isNotificationPossible: true,
   } as AppState);
 
   // App State Modification. Example of a call: handleStateChange("Leo", ["account", "username"]);
@@ -72,31 +55,16 @@ function App() {
       setAppState(newAppState);
     }
   }
-
-  //Render (protected) routes
-  const renderCurrentElement = (
-    <ProtectedRoute
-      appState={appState}
-      element={
-        useLocation().pathname === "/workspace" ? (
-          <WorkSpace appState={appState} onChange={handleStateChange} />
-        ) : (
-          <Start appState={appState} onChange={handleStateChange} />
-        )
-      }
-    />
-  );
-
   return (
     <div className="App">
       {notifier.init()}
       <Routes>
         <Route index element={<Navigate to={"/log-in"} />} />
         <Route path="/">
-          <Route path=":id" element={renderCurrentElement} />
+          <Route path=":id" element={<Start />} />
         </Route>
-        <Route path="/not-found" element={<PageNotFound />} />
-        <Route path="*" element={<PageNotFound />} />
+        <Route path="/workspace" element={<Workspace />} />
+        <Route path="*" element={<Navigate to={"/page-not-found"} />} />
       </Routes>
     </div>
   );

@@ -1,61 +1,54 @@
-import Form from "./form";
-import InputField from "./inputField";
-import userService from "./../../services/userService";
-import Joi from "joi";
-import { Link, NavigateFunction } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Form, {
+  IFormProps,
+  EmailPassword,
+  SchemaEmailPassword,
+} from "./../common/form";
+import userService from "../../../services/userService";
 
 interface LoginFormProps {
-  data: {
-    email: string;
-    password: string;
-  };
-  errors: {};
-  isNotificationPossible: boolean;
-  onChange: (value: any, location: string[]) => void;
-  navigator: NavigateFunction;
+  formProps: IFormProps<EmailPassword, SchemaEmailPassword>;
 }
 
 interface LoginFormState {
-  schema: Schema;
-  showAuthText: boolean;
+  showGoogleAuthText: boolean;
 }
 
-interface Schema {
-  email: Joi.StringSchema<string>;
-  password: Joi.StringSchema<string>;
-}
-
-class LoginForm extends Form<LoginFormProps, LoginFormState> {
+class LoginForm extends Form<
+  EmailPassword,
+  SchemaEmailPassword,
+  LoginFormProps,
+  LoginFormState
+> {
   state = {
-    schema: {
-      email: Joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ["com"] } })
-        .required()
-        .label("Email")
-        .regex(/gmail/i)
-        .message('"Email" should be a Google account (gmail)'),
-      password: Joi.string()
-        .alphanum()
-        .min(5)
-        .max(30)
-        .required()
-        .label("Password"),
-    },
+    showGoogleAuthText: true,
+  };
 
-    showAuthText: true,
+  specificState = (): { data: EmailPassword; schema: SchemaEmailPassword } => {
+    return {
+      data: {
+        email: this.props.formProps.globalData.email,
+        password: this.props.formProps.globalData.password,
+      },
+      schema: {
+        email: this.props.formProps.globalSchema.email,
+        password: this.props.formProps.globalSchema.password,
+      },
+    };
   };
 
   onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const { email, password } = this.props.data;
+    const { email, password } = this.props.formProps.globalData;
+    const { navigator } = this.props.formProps;
     const responseCreateJWT = await userService.createJWT(email, password);
     if (responseCreateJWT) {
-      this.props.onChange(true, ["isUserLoggedIn"]);
-      this.props.navigator("/workspace");
+      localStorage.setItem("isUserLoggedIn", "true");
+      navigator("/workspace");
     }
   };
 
   render() {
-    const { email, password } = this.props.data;
+    const { email, password } = this.props.formProps.globalData;
     return (
       <div className="form">
         <header>
