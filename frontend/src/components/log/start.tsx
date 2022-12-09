@@ -36,11 +36,14 @@ import {
   SchemaEmailPasswordRepeatPassword,
 } from "./common/form";
 import config from "./config";
-import "./../../css/start.css";
 import RouteWrapper from "./wrappers/routeWrapper";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AppState } from "../../App";
+import "./../../css/log/start.css";
 
-interface StartProps {}
+interface StartProps {
+  appState: AppState;
+}
 
 interface StartState<Type extends Object> {
   account: Type;
@@ -48,13 +51,13 @@ interface StartState<Type extends Object> {
   flags: {};
 }
 
-const Start: React.FunctionComponent<StartProps> = () => {
+const Start: React.FunctionComponent<StartProps> = ({ appState }) => {
   const [startState, setStartState] = React.useState({
     account: { email: "", password: "", repeatPassword: "" },
     errors: {},
     flags: {
       isNotificationPossible: true,
-      isActivationEmailSent: true,
+      isActivationEmailSent: false,
       isPasswordResetEmailSent: false,
       shouldSignUpAgain: false,
     },
@@ -133,7 +136,7 @@ const Start: React.FunctionComponent<StartProps> = () => {
     <RouteWrapper
       formProps={formProps}
       element={
-        <div id="Start" ref={startRef}>
+        <div id="Start" style={appState.theme.Start} ref={startRef}>
           <div className="bg" style={bgStyle} />
           <FormWrapper formProps={formProps} />
           <div className="bot">

@@ -4,9 +4,11 @@ import Start from "./components/log/start";
 import notifier from "./services/notificationService";
 import "./App.css";
 import Workspace from "./components/workspace/workspace";
+import ThemeSetter from "./components/themes/themeSetter";
 
 export interface AppState {
   isUserLoggedIn: boolean;
+  theme: ThemeSetter;
 }
 
 function App() {
@@ -14,6 +16,7 @@ function App() {
 
   const [appState, setAppState] = React.useState({
     isUserLoggedIn: false,
+    theme: ThemeSetter.init(),
   } as AppState);
 
   // App State Modification. Example of a call: handleStateChange("Leo", ["account", "username"]);
@@ -61,7 +64,7 @@ function App() {
       <Routes>
         <Route index element={<Navigate to={"/log-in"} />} />
         <Route path="/">
-          <Route path=":id" element={<Start />} />
+          <Route path=":id" element={<Start appState={appState} />} />
         </Route>
         <Route path="/workspace" element={<Workspace />} />
         <Route path="*" element={<Navigate to={"/page-not-found"} />} />

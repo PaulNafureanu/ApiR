@@ -67,12 +67,11 @@ class SetNewPasswordForm extends Form<
       const local_uid = localStorage.getItem("local_uid");
       const local_token = localStorage.getItem("local_token");
       if (local_uid && local_token) {
-        // const responseSetNewPassword = await userService.setNewPassword(
-        //   local_uid,
-        //   local_token,
-        //   password
-        // );
-        const responseSetNewPassword = true;
+        const responseSetNewPassword = await userService.setNewPassword(
+          local_uid,
+          local_token,
+          password
+        );
         if (responseSetNewPassword) {
           notifier.info("Congrats! Your password was successfully changed 😄");
           onChange("", ["account", "password"]);
