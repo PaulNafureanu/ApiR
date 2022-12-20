@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Form from "./../common/form";
 import userService from "../../../services/userService";
 import {
@@ -16,6 +16,8 @@ interface SignupFormProps {
 
 interface SignupFormState {
   showGoogleAuthText: boolean;
+  isButtonOnDefaultStyle: boolean;
+  isSignInOnDefaultStyle: boolean;
 }
 
 class SignupForm extends Form<
@@ -26,6 +28,8 @@ class SignupForm extends Form<
 > {
   state = {
     showGoogleAuthText: false,
+    isButtonOnDefaultStyle: true,
+    isSignInOnDefaultStyle: true,
   };
 
   specificState = (): {
@@ -68,10 +72,14 @@ class SignupForm extends Form<
 
   render() {
     const { email, password, repeatPassword } = this.props.formProps.globalData;
+    const { isSignInOnDefaultStyle } = this.state;
+    const { Self, Text } = this.props.formProps.theme.Form;
     return (
-      <div className="form">
+      <div className="form" style={Self}>
         <header>
-          <div className="title">Sign Up</div>
+          <div className="title" style={Text.Title}>
+            Sign Up
+          </div>
         </header>
         <form onSubmit={this.handleSubmit.bind(this)}>
           <div className="inputFieldWrapper">
@@ -97,10 +105,17 @@ class SignupForm extends Form<
                 "password"
               )}
               <div className="logInOption">
-                <span className="accountQuestion">Do you have an account?</span>
-                <Link className="logInText" to="/log-in">
-                  Log In Here
-                </Link>
+                <span className="accountQuestion" style={Text.Question}>
+                  Do you have an account?
+                </span>
+                {this.renderLink({
+                  label: "Log In Here",
+                  clasName: "logInText",
+                  to: "/log-in",
+                  propName: "isSignInOnDefaultStyle",
+                  propValue: isSignInOnDefaultStyle,
+                  styles: Text.Link.SignInOut,
+                })}
               </div>
             </div>
           </div>

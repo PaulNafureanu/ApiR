@@ -1,8 +1,10 @@
 import * as React from "react";
 import Joi from "joi";
-import { Location, NavigateFunction } from "react-router-dom";
+import { Link, Location, NavigateFunction } from "react-router-dom";
 import Input from "./input";
 import notifier from "./../../../services/notificationService";
+import ThemeSetter from "../../themes/themeSetter";
+import "./../../../css/log/common/form.css";
 
 export interface Email {
   email: string;
@@ -57,6 +59,7 @@ export interface IFormProps<Type extends Object, SchemaType extends Object> {
   navigator: NavigateFunction;
   locator: Location;
   onChange: (value: any, location: string[]) => void;
+  theme: ThemeSetter;
 }
 
 interface FormProps<Type extends Object, SchemaType extends Object> {
@@ -65,6 +68,7 @@ interface FormProps<Type extends Object, SchemaType extends Object> {
 
 interface FormState {
   showGoogleAuthText: boolean;
+  isButtonOnDefaultStyle: boolean;
 }
 
 class Form<
@@ -73,6 +77,10 @@ class Form<
   ExtendedFormProps extends FormProps<FormType, SchemaType>,
   ExtendedFormState extends FormState
 > extends React.Component<ExtendedFormProps, ExtendedFormState> {
+  componentDidUpdate() {
+    this.onSetButtonState();
+  }
+
   specificState = (): { data: FormType; schema: SchemaType } => {
     return {
       data: this.props.formProps.globalData,
@@ -128,7 +136,25 @@ class Form<
     }, 5000);
   }
 
+  onSetButtonState = () => {
+    const newState: any = { ...this.state };
+    const value = this.validate() ? true : false;
+    if (newState["isButtonOnDefaultStyle"] !== value) {
+      newState["isButtonOnDefaultStyle"] = value;
+      this.setState(newState);
+    }
+  };
+
+  onSetButtonStyle = (
+    propValue: boolean,
+    styles: { onDefault: {}; onDisabled: {} }
+  ) => {
+    return propValue ? styles.onDefault : styles.onDisabled;
+  };
+
   renderButton(label: string) {
+    const { Button, Text } = this.props.formProps.theme.Form;
+    const { isButtonOnDefaultStyle } = this.state;
     return (
       <div className="buttonForm">
         <div
@@ -156,9 +182,14 @@ class Form<
             }
           }}
         >
-          <button disabled={this.validate() ? true : false}>{label}</button>
+          <button
+            style={this.onSetButtonStyle(isButtonOnDefaultStyle, Button)}
+            disabled={this.validate() ? true : false}
+          >
+            {label}
+          </button>
         </div>
-        <span>
+        <span style={Text.Details}>
           {this.state.showGoogleAuthText
             ? "*Authorize access to my Google Drive"
             : ""}
@@ -183,7 +214,47 @@ class Form<
         spanValue={spanValue}
         em={em}
         inputType={inputType}
+        theme={this.props.formProps.theme}
       />
+    );
+  }
+
+  onSetLinkState = (propName: string, value: boolean) => {
+    const newState: any = { ...this.state };
+    newState[propName] = value;
+    this.setState(newState);
+  };
+
+  onSetLinkStyle = (
+    propValue: boolean,
+    styles: { onDefault: {}; onHover: {} }
+  ) => {
+    return propValue ? styles.onDefault : styles.onHover;
+  };
+
+  renderLink(options: {
+    label: string;
+    clasName: string;
+    to: string;
+    propName: string;
+    propValue: boolean;
+    styles: { onDefault: {}; onHover: {} };
+  }) {
+    const { label, clasName, to, propName, propValue, styles } = options;
+    return (
+      <Link
+        className={clasName}
+        to={to}
+        onMouseOver={() => {
+          this.onSetLinkState(propName, false);
+        }}
+        onMouseOut={() => {
+          this.onSetLinkState(propName, true);
+        }}
+        style={this.onSetLinkStyle(propValue, styles)}
+      >
+        {label}
+      </Link>
     );
   }
 }

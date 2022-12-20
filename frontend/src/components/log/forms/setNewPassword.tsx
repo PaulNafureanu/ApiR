@@ -13,6 +13,7 @@ interface SetNewPasswordFormProps {
 
 interface SetNewPasswordFormState {
   showGoogleAuthText: boolean;
+  isButtonOnDefaultStyle: boolean;
 }
 
 class SetNewPasswordForm extends Form<
@@ -23,6 +24,7 @@ class SetNewPasswordForm extends Form<
 > {
   state = {
     showGoogleAuthText: false,
+    isButtonOnDefaultStyle: true,
   };
 
   specificState = (): {
@@ -88,10 +90,13 @@ class SetNewPasswordForm extends Form<
 
   render() {
     const { password, repeatPassword } = this.props.formProps.globalData;
+    const { Self, Text } = this.props.formProps.theme.Form;
     return (
-      <div className="form">
+      <div className="form" style={Self}>
         <header>
-          <h1 className="title">Set New Password</h1>
+          <h1 className="title" style={Text.Title}>
+            Set New Password
+          </h1>
         </header>
         <form onSubmit={this.handleSubmit.bind(this)} noValidate>
           <div className="inputFieldWrapper">

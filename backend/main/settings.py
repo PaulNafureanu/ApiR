@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'main.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Apir',
+        'NAME': 'ApiR',
         'HOST': 'localhost',
         'USER': 'root',
         'PASSWORD': 'DevPassword'

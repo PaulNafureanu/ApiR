@@ -71,6 +71,7 @@ const Start: React.FunctionComponent<StartProps> = ({ appState }) => {
     onChange: handleChange,
     navigator: useNavigate(),
     locator: useLocation(),
+    theme: appState.theme,
   } as IFormProps<
     EmailPasswordRepeatPassword,
     SchemaEmailPasswordRepeatPassword
@@ -121,22 +122,32 @@ const Start: React.FunctionComponent<StartProps> = ({ appState }) => {
   }
 
   //State for the visual effects on the login/registration page
+  const { Static, VfxLantern } = appState.theme.Start;
   const startRef = React.createRef<HTMLDivElement>();
-  const [bgStyle, setBgStyle] = React.useState(vfx.backgroundStyle);
   const [circleSize, setCircleSize] = React.useState(80);
+  const [bgStyle, setBgStyle] = React.useState(
+    vfx.backgroundStyle({
+      backgroundColor: Static.backgroundColor,
+      backgroundImage: Static.backgroundImage,
+    })
+  );
 
   //The lantern effect
   React.useEffect(() => {
-    vfx.useLanternVFX(startRef, bgStyle, setBgStyle, circleSize, setCircleSize);
-    localStorage.setItem("isSettingNewPassword", "true");
-    // localStorage.clear();
+    vfx.useLanternVFX(
+      startRef,
+      setBgStyle,
+      circleSize,
+      setCircleSize,
+      VfxLantern
+    );
   });
 
   return (
     <RouteWrapper
       formProps={formProps}
       element={
-        <div id="Start" style={appState.theme.Start} ref={startRef}>
+        <div id="Start" style={Static} ref={startRef}>
           <div className="bg" style={bgStyle} />
           <FormWrapper formProps={formProps} />
           <div className="bot">

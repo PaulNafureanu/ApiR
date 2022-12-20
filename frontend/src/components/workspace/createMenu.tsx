@@ -1,6 +1,6 @@
 import * as React from "react";
 import { MethodsSupported } from "../../scripts/UserProject";
-import InputField from "../log/common/input";
+import Input from "../log/common/input";
 import "./../../css/createMenu.css";
 import "./../../css/utils.css";
 
@@ -89,7 +89,7 @@ const CreateMenu: React.FunctionComponent<CreateMenuProps> = ({
       okButtonStyle = { width: "8.5rem" };
       menu = (
         <React.Fragment>
-          <InputField
+          <Input
             value={newItemName}
             onChange={(value) => handleInputNameChange(value)}
             spanValue={getCreateMenuText().inputSpanValue}

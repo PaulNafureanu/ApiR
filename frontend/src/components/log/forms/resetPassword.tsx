@@ -9,6 +9,8 @@ interface ResetPasswordFormProps {
 
 interface ResetPasswordFormState {
   showGoogleAuthText: boolean;
+  isButtonOnDefaultStyle: boolean;
+  isSignInOnDefaultStyle: boolean;
 }
 
 class ResetPasswordForm extends Form<
@@ -19,6 +21,8 @@ class ResetPasswordForm extends Form<
 > {
   state = {
     showGoogleAuthText: false,
+    isSignInOnDefaultStyle: true,
+    isButtonOnDefaultStyle: true,
   };
 
   specificState = (): { data: Email; schema: SchemaEmail } => {
@@ -50,10 +54,14 @@ class ResetPasswordForm extends Form<
 
   render() {
     const { email } = this.props.formProps.globalData;
+    const { isSignInOnDefaultStyle } = this.state;
+    const { Self, Text } = this.props.formProps.theme.Form;
     return (
-      <div className="form">
+      <div className="form" style={Self}>
         <header>
-          <h1 className="title">Reset Password</h1>
+          <h1 className="title" style={Text.Title}>
+            Reset Password
+          </h1>
         </header>
         <form onSubmit={this.handleSubmit.bind(this)} noValidate>
           <div className="inputFieldWrapper">
@@ -67,12 +75,17 @@ class ResetPasswordForm extends Form<
                 true
               )}
               <div className="logInOption">
-                <span className="accountQuestion">
+                <span className="accountQuestion" style={Text.Question}>
                   Do you remember the password?
                 </span>
-                <Link className="logInText" to="/log-in">
-                  Log In Here
-                </Link>
+                {this.renderLink({
+                  label: "Log In Here",
+                  clasName: "logInText",
+                  to: "/log-in",
+                  propName: "isSignInOnDefaultStyle",
+                  propValue: isSignInOnDefaultStyle,
+                  styles: Text.Link.SignInOut,
+                })}
               </div>
             </div>
           </div>

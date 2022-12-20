@@ -1,10 +1,10 @@
-.inputBox {
+.inputContainer {
   position: relative;
   width: 20rem;
   height: 2.5rem;
   overflow: visible;
 }
-.inputBox input {
+.inputContainer input {
   width: 100%;
   height: 100%;
   padding: 10px;
@@ -17,7 +17,7 @@
   transition: 0.5s;
   box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.04), 22.3px 22.3px 17.9px rgba(0, 0, 0, 0.06), 100px 100px 80px rgba(0, 0, 0, 0.1);
 }
-.inputBox span {
+.inputContainer span {
   position: absolute;
   display: flex;
   justify-content: center;
@@ -33,8 +33,8 @@
   transition: 0.5s;
   font-size: 1rem;
 }
-.inputBox input:valid ~ span,
-.inputBox input:focus ~ span {
+.inputContainer input:valid ~ span,
+.inputContainer input:focus ~ span {
   background-color: #45f3ff;
   color: #1d2b3a;
   border-radius: 2px;
@@ -45,14 +45,14 @@
   border-right: 1px solid #45f3ff;
   letter-spacing: 0.1rem;
 }
-.inputBox input:valid ~ span.em,
-.inputBox input:focus ~ span.em {
+.inputContainer input:valid ~ span.em,
+.inputContainer input:focus ~ span.em {
   color: #45f3ff;
   background-color: #1d2b3a;
 }
-.inputBox input:valid,
-.inputBox input:focus {
+.inputContainer input:valid,
+.inputContainer input:focus {
   border: 1px solid #45f3ff;
 }
 
-/*# sourceMappingURL=inputField.css.map */
+/*# sourceMappingURL=input.css.map */

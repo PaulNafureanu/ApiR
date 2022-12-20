@@ -5,6 +5,7 @@ import {
   NavigateFunction,
   useNavigate,
 } from "react-router-dom";
+import "./../../../css/log/common/form.css";
 
 export interface InfoFuncParams {
   email?: string;
@@ -20,6 +21,7 @@ export interface InfoProps {
   subtext?: string;
   linkText?: string;
   question?: string;
+  theme: any;
   onSubmit: (params: InfoFuncParams) => {};
   onEffect: (params: InfoFuncParams) => string | undefined;
   funcParams: InfoFuncParams;
@@ -28,7 +30,15 @@ interface InfoPageProps {
   infoProps: InfoProps;
 }
 
+interface InfoPageState {
+  isSignUpOnDefaultStyle: boolean;
+}
+
 const InfoPage: React.FunctionComponent<InfoPageProps> = ({ infoProps }) => {
+  const [infoState, setInfoState] = React.useState({
+    isSignUpOnDefaultStyle: true,
+  } as InfoPageState);
+
   const {
     title,
     subtitle,
@@ -38,8 +48,10 @@ const InfoPage: React.FunctionComponent<InfoPageProps> = ({ infoProps }) => {
     subtext = "(You can now close this web page)",
     linkText = "Resend email",
     question = "No email from us?",
+    theme,
   } = infoProps;
 
+  const { Self, Text, Info } = theme.Form;
   const navigator = useNavigate();
   React.useEffect(() => {
     if (onEffect) {
@@ -50,25 +62,56 @@ const InfoPage: React.FunctionComponent<InfoPageProps> = ({ infoProps }) => {
     }
   });
 
+  const onSetLinkState = (propName: string, value: boolean) => {
+    const newState: any = { ...infoState };
+    newState[propName] = value;
+    setInfoState(newState);
+  };
+
+  const onSetLinkStyle = (
+    propValue: boolean,
+    styles: { onDefault: {}; onHover: {} }
+  ) => {
+    return propValue ? styles.onDefault : styles.onHover;
+  };
+
   return (
-    <div className="form">
+    <div className="form" style={Self}>
       <header>
-        <h1 className="title">{title}</h1>
+        <h1 className="title" style={Text.Title}>
+          {title}
+        </h1>
       </header>
       <div className="info">
         <div className="inputFieldWrapper">
-          <p className="sup">{subtitle}</p>
-          <p>{text}</p>
-          <p className="sub">{subtext}</p>
+          <p className="sup" style={Info.Text}>
+            {subtitle}
+          </p>
+          <p style={Info.Text}>{text}</p>
+          <p className="sub" style={Info.Text}>
+            {subtext}
+          </p>
 
           <div className="signUpOption">
-            <span className="accountQuestion">{question}</span>
+            <span className="accountQuestion" style={Text.Question}>
+              {question}
+            </span>
             <Link
               onClick={() => {
                 if (onSubmit) onSubmit(infoProps.funcParams);
               }}
               className="logInText"
               to={"/sign-up"}
+              onMouseOver={() => {
+                onSetLinkState("isSignUpOnDefaultStyle", false);
+              }}
+              onMouseOut={() => {
+                onSetLinkState("isSignUpOnDefaultStyle", true);
+              }}
+              style={onSetLinkStyle(
+                infoState.isSignUpOnDefaultStyle,
+                Text.Link.SignInOut
+              )}
             >
               {linkText}
             </Link>

@@ -39,6 +39,7 @@ export default {
       localStorage.setItem("isActivationConfirmed", "true");
     },
     funcParams: { email: "", navigator: undefined, locator: undefined },
+    theme: {},
   } as InfoProps,
   infoProps_ConfirmActivation: {
     title: "Account activated",
@@ -77,6 +78,7 @@ export default {
     },
     question: "Do you want to log in?",
     linkText: "Log in here",
+    theme: {},
     onSubmit: (navigator: NavigateFunction) => {
       navigator("/log-in");
     },
@@ -87,6 +89,7 @@ export default {
     subtitle: "A password reset link was sent",
     text: "The form was submitted. Check your email, click the password reset link, set a new password and log in.",
     linkText: "Resend email",
+    theme: {},
     onSubmit: ({ email }) => {
       if (email) userService.resetPassword(email);
     },
@@ -96,6 +99,7 @@ export default {
     funcParams: { email: "", navigator: undefined, locator: undefined },
   } as InfoProps,
   infoProps_ConfirmPWReset: {
+    theme: {},
     onSubmit: (navigator: NavigateFunction) => {
       navigator("/log-in");
     },
@@ -106,6 +110,7 @@ export default {
     text: "This page doesn't exist! Either this link is broken, or the page have been (re)moved. Please check the URL link.",
     linkText: "Log in here",
     question: "Do you want to log in?",
+    theme: {},
     onSubmit: (params) => {},
   } as InfoProps,
 };

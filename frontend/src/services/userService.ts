@@ -189,6 +189,45 @@ async function setNewPassword(uid: string, token: string, password: string) {
   }
 }
 
+// Google Api endpoint:
+
+async function GoogleAPIAuth() {
+  try {
+    const { data: response } = await http.get(
+      config.GoogleApiEndpoint + "authorize"
+    );
+    console.log(response);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function GoogleAPIRevoke() {
+  try {
+    const { data: response } = await http.get(
+      config.GoogleApiEndpoint + "revoke"
+    );
+    console.log(response);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function GoogleAPIClear() {
+  try {
+    const { data: response } = await http.get(
+      config.GoogleApiEndpoint + "clear"
+    );
+    console.log(response);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+//TODO: delete and clear acc
 export default {
   createUser,
   activateUser,
@@ -198,4 +237,7 @@ export default {
   verifyJWT,
   resetPassword,
   setNewPassword,
+  GoogleAPIAuth,
+  GoogleAPIRevoke,
+  GoogleAPIClear,
 };

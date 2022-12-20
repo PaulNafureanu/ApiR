@@ -1,4 +1,3 @@
-import { Link, useNavigate } from "react-router-dom";
 import Form, {
   IFormProps,
   EmailPassword,
@@ -12,6 +11,9 @@ interface LoginFormProps {
 
 interface LoginFormState {
   showGoogleAuthText: boolean;
+  isPasswordResetOnDefaultStyle: boolean;
+  isSignUpOnDefaultStyle: boolean;
+  isButtonOnDefaultStyle: boolean;
 }
 
 class LoginForm extends Form<
@@ -22,6 +24,9 @@ class LoginForm extends Form<
 > {
   state = {
     showGoogleAuthText: true,
+    isPasswordResetOnDefaultStyle: true,
+    isSignUpOnDefaultStyle: true,
+    isButtonOnDefaultStyle: true,
   };
 
   specificState = (): { data: EmailPassword; schema: SchemaEmailPassword } => {
@@ -40,19 +45,25 @@ class LoginForm extends Form<
   onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const { email, password } = this.props.formProps.globalData;
     const { navigator } = this.props.formProps;
-    const responseCreateJWT = await userService.createJWT(email, password);
-    if (responseCreateJWT) {
-      localStorage.setItem("isUserLoggedIn", "true");
-      navigator("/workspace");
-    }
+    const response = await userService.GoogleAPIAuth();
+    // const responseCreateJWT = await userService.createJWT(email, password);
+    // if (responseCreateJWT) {
+    //   localStorage.setItem("isUserLoggedIn", "true");
+    //   navigator("/workspace");
+    // }
   };
 
   render() {
     const { email, password } = this.props.formProps.globalData;
+    const { Self, Text } = this.props.formProps.theme.Form;
+    const { isPasswordResetOnDefaultStyle, isSignUpOnDefaultStyle } =
+      this.state;
     return (
-      <div className="form">
+      <div className="form" style={Self}>
         <header>
-          <h1 className="title">Log in</h1>
+          <h1 className="title" style={Text.Title}>
+            Log in
+          </h1>
         </header>
         <form onSubmit={this.handleSubmit.bind(this)} noValidate>
           <div className="inputFieldWrapper">
@@ -72,12 +83,22 @@ class LoginForm extends Form<
                 "password"
               )}
               <div className="signUpOption">
-                <Link className="forgetPasswordOption" to="/reset-password">
-                  Forget Password?
-                </Link>
-                <Link className="signUpText" to="/sign-up">
-                  Sign Up Here
-                </Link>
+                {this.renderLink({
+                  label: "Forget Password?",
+                  clasName: "forgetPasswordOption",
+                  to: "/reset-password",
+                  propName: "isPasswordResetOnDefaultStyle",
+                  propValue: isPasswordResetOnDefaultStyle,
+                  styles: Text.Link.PasswordReset,
+                })}
+                {this.renderLink({
+                  label: "Sign Up Here",
+                  clasName: "signUpText",
+                  to: "/sign-up",
+                  propName: "isSignUpOnDefaultStyle",
+                  propValue: isSignUpOnDefaultStyle,
+                  styles: Text.Link.SignInOut,
+                })}
               </div>
             </div>
           </div>

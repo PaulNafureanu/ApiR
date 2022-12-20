@@ -12,7 +12,7 @@ import {
   SchemaEmailPasswordRepeatPassword,
 } from "../common/form";
 import config from "./../config";
-import "./../../../css/formWrapper.css";
+import "./../../../css/log/wrappers/formWrapper.css";
 
 interface FormWrapperProps {
   formProps: IFormProps<
@@ -25,6 +25,7 @@ const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
   formProps,
 }) => {
   //The form tilt effect on the login/registration page
+  const { Container, AfterRay, BeforeRay } = formProps.theme.FormWrapper;
   const tiltRef = React.createRef<HTMLDivElement>();
   React.useEffect(() => {
     vfx.useTiltVFX(tiltRef);
@@ -45,6 +46,7 @@ const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
       case "send-activation-email-link": {
         const { email } = formProps.globalData;
         config.infoProps_SendActivEmailLink.funcParams.email = email;
+        config.infoProps_SendActivEmailLink.theme = formProps.theme;
         return <InfoPage infoProps={config.infoProps_SendActivEmailLink} />;
       }
       case "confirm-activation": {
@@ -52,6 +54,7 @@ const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
         config.infoProps_ConfirmActivation.funcParams.locator = locator;
         config.infoProps_ConfirmActivation.funcParams.onChange = onChange;
         config.infoProps_ConfirmActivation.funcParams.navigator = navigator;
+        config.infoProps_ConfirmActivation.theme = formProps.theme;
         return <InfoPage infoProps={config.infoProps_ConfirmActivation} />;
       }
       case "reset-password": {
@@ -60,23 +63,29 @@ const FormWrapper: React.FunctionComponent<FormWrapperProps> = ({
       case "send-password-reset-email-link": {
         const { email } = formProps.globalData;
         config.infoProps_SendActivEmailLink.funcParams.email = email;
+        config.infoProps_SendActivEmailLink.theme = formProps.theme;
         return <InfoPage infoProps={config.infoProps_SendPWResetEmailLink} />;
       }
       case "set-new-password": {
         return <SetNewPasswordForm formProps={formProps} />;
       }
       case "page-not-found": {
+        config.infoProps_PageNotFound.theme = formProps.theme;
         return <InfoPage infoProps={config.infoProps_PageNotFound} />;
       }
       default: {
+        config.infoProps_PageNotFound.theme = formProps.theme;
         return <InfoPage infoProps={config.infoProps_PageNotFound} />;
       }
     }
   }
-
   return (
-    <div className={"Tilt"} ref={tiltRef} {...vfx.tiltOptions}>
-      <div className="container">{renderFormWrapper()}</div>
+    <div id={"Tilt"} ref={tiltRef} {...vfx.tiltOptions}>
+      <div className="container" style={Container}>
+        <div className="beforeRay" style={BeforeRay} />
+        {renderFormWrapper()}
+        <div className="afterRay" style={AfterRay} />
+      </div>
     </div>
   );
 };

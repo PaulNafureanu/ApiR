@@ -5,6 +5,7 @@ import notifier from "./services/notificationService";
 import "./App.css";
 import Workspace from "./components/workspace/workspace";
 import ThemeSetter from "./components/themes/themeSetter";
+import modernPurple from "./components/themes/presets/modernPurple";
 
 export interface AppState {
   isUserLoggedIn: boolean;
@@ -18,6 +19,14 @@ function App() {
     isUserLoggedIn: false,
     theme: ThemeSetter.init(),
   } as AppState);
+
+  let x = 1;
+  function o() {
+    console.log("Outter f:", x);
+    function i() {
+      console.log("Inner f: ", x);
+    }
+  }
 
   // App State Modification. Example of a call: handleStateChange("Leo", ["account", "username"]);
   function handleStateChange<Type>(value: Type, location: string[]) {
