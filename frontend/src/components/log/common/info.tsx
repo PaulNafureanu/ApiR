@@ -23,7 +23,7 @@ export interface InfoProps {
   question?: string;
   theme: any;
   onSubmit: (params: InfoFuncParams) => {};
-  onEffect: (params: InfoFuncParams) => string | undefined;
+  onEffect: (params: InfoFuncParams) => string | undefined | Promise<string>;
   funcParams: InfoFuncParams;
 }
 interface InfoPageProps {
@@ -53,13 +53,18 @@ const InfoPage: React.FunctionComponent<InfoPageProps> = ({ infoProps }) => {
 
   const { Self, Text, Info } = theme.Form;
   const navigator = useNavigate();
-  React.useEffect(() => {
+  const resultEfect = async () => {
     if (onEffect) {
       const result = onEffect(infoProps.funcParams);
       if (result) {
-        navigator(result);
+        if (typeof result == "string") navigator(result);
+        else navigator(await result);
       }
     }
+  };
+
+  React.useEffect(() => {
+    resultEfect();
   });
 
   const onSetLinkState = (propName: string, value: boolean) => {

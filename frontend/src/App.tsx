@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import Start from "./components/log/start";
 import notifier from "./services/notificationService";
 import "./App.css";
@@ -14,19 +14,10 @@ export interface AppState {
 
 function App() {
   //State for the main interactions of the user with the app
-
   const [appState, setAppState] = React.useState({
     isUserLoggedIn: false,
     theme: ThemeSetter.init(),
   } as AppState);
-
-  let x = 1;
-  function o() {
-    console.log("Outter f:", x);
-    function i() {
-      console.log("Inner f: ", x);
-    }
-  }
 
   // App State Modification. Example of a call: handleStateChange("Leo", ["account", "username"]);
   function handleStateChange<Type>(value: Type, location: string[]) {
@@ -67,6 +58,12 @@ function App() {
       setAppState(newAppState);
     }
   }
+
+  const pathname = useLocation().pathname.split("/")[1];
+  if ("exit" == pathname) {
+    globalThis.close();
+  }
+
   return (
     <div className="App">
       {notifier.init()}

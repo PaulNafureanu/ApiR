@@ -13,7 +13,7 @@ interface LoginFormState {
   showGoogleAuthText: boolean;
   isPasswordResetOnDefaultStyle: boolean;
   isSignUpOnDefaultStyle: boolean;
-  isButtonOnDefaultStyle: boolean;
+  isButtonDisabled: boolean;
 }
 
 class LoginForm extends Form<
@@ -26,7 +26,7 @@ class LoginForm extends Form<
     showGoogleAuthText: true,
     isPasswordResetOnDefaultStyle: true,
     isSignUpOnDefaultStyle: true,
-    isButtonOnDefaultStyle: true,
+    isButtonDisabled: true,
   };
 
   specificState = (): { data: EmailPassword; schema: SchemaEmailPassword } => {
@@ -45,12 +45,17 @@ class LoginForm extends Form<
   onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const { email, password } = this.props.formProps.globalData;
     const { navigator } = this.props.formProps;
-    const response = await userService.GoogleAPIAuth();
-    // const responseCreateJWT = await userService.createJWT(email, password);
-    // if (responseCreateJWT) {
-    //   localStorage.setItem("isUserLoggedIn", "true");
-    //   navigator("/workspace");
-    // }
+    const responseCreateJWT = await userService.createJWT(email, password);
+    if (responseCreateJWT) {
+      const accessToken = localStorage.getItem("access") || "";
+      const responseGAuth = await userService.GoogleAPIAuth(accessToken);
+      if (responseGAuth) {
+        setTimeout(() => {
+          localStorage.setItem("isUserLoggedIn", "true");
+          navigator("/workspace");
+        }, 1000);
+      }
+    }
   };
 
   render() {

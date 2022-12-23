@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path('test/', views.test),
     path('authorize/', views.userAuthorization),
-    path('oauth2callback/', views.oauth2Callback),
+    path('oauth2callback/<int:id>/', views.oauth2Callback),
     path('revoke/', views.revoke),
     path('clear/', views.clear),
 ]

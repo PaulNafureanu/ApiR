@@ -68,7 +68,7 @@ interface FormProps<Type extends Object, SchemaType extends Object> {
 
 interface FormState {
   showGoogleAuthText: boolean;
-  isButtonOnDefaultStyle: boolean;
+  isButtonDisabled: boolean;
 }
 
 class Form<
@@ -139,8 +139,8 @@ class Form<
   onSetButtonState = () => {
     const newState: any = { ...this.state };
     const value = this.validate() ? true : false;
-    if (newState["isButtonOnDefaultStyle"] !== value) {
-      newState["isButtonOnDefaultStyle"] = value;
+    if (newState["isButtonDisabled"] !== value) {
+      newState["isButtonDisabled"] = value;
       this.setState(newState);
     }
   };
@@ -154,7 +154,7 @@ class Form<
 
   renderButton(label: string) {
     const { Button, Text } = this.props.formProps.theme.Form;
-    const { isButtonOnDefaultStyle } = this.state;
+    const { isButtonDisabled } = this.state;
     return (
       <div className="buttonForm">
         <div
@@ -183,8 +183,8 @@ class Form<
           }}
         >
           <button
-            style={this.onSetButtonStyle(isButtonOnDefaultStyle, Button)}
-            disabled={this.validate() ? true : false}
+            style={this.onSetButtonStyle(isButtonDisabled, Button)}
+            disabled={isButtonDisabled || this.validate() ? true : false}
           >
             {label}
           </button>

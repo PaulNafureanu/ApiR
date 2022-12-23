@@ -59,20 +59,21 @@ export default {
           const local_token = localStorage.getItem("local_token");
           if (local_uid && local_token) {
             const promise = userService.activateUser(local_uid, local_token);
-            promise.then((responseActivateUser) => {
-              if (!responseActivateUser) {
-                onChange(true, ["flags", "shouldSignUpAgain"]);
-              } else {
-                notifier.info(
+            localStorage.removeItem("local_uid");
+            localStorage.removeItem("local_token");
+            localStorage.removeItem("isActivationConfirmed");
+            return promise.then((responseActivateUser) => {
+              if (responseActivateUser) {
+                notifier.success(
                   "Congrats! Your account was successfully activated 😄"
                 );
+                return "/log-in";
+              } else {
+                onChange(true, ["flags", "shouldSignUpAgain"]);
+                return "/sign-up";
               }
             });
           }
-          localStorage.removeItem("local_uid");
-          localStorage.removeItem("local_token");
-          localStorage.removeItem("isActivationConfirmed");
-          return "/log-in";
         }
       }
     },

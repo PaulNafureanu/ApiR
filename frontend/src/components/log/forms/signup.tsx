@@ -16,7 +16,7 @@ interface SignupFormProps {
 
 interface SignupFormState {
   showGoogleAuthText: boolean;
-  isButtonOnDefaultStyle: boolean;
+  isButtonDisabled: boolean;
   isSignInOnDefaultStyle: boolean;
 }
 
@@ -28,9 +28,9 @@ class SignupForm extends Form<
 > {
   state = {
     showGoogleAuthText: false,
-    isButtonOnDefaultStyle: true,
+    isButtonDisabled: true,
     isSignInOnDefaultStyle: true,
-  };
+  } as SignupFormState;
 
   specificState = (): {
     data: EmailPasswordRepeatPassword;
@@ -55,18 +55,14 @@ class SignupForm extends Form<
     const { shouldSignUpAgain } = this.props.formProps.flags;
     const { navigator } = this.props.formProps;
     let response: boolean = false;
-    setTimeout(() => {
-      this.props.formProps.onChange(true, ["flags", "isActivationEmailSent"]);
-      navigator("/send-activation-email-link");
-    }, 500);
     if (shouldSignUpAgain) {
       response = await userService.resendActivationEmail(email);
     } else {
       response = await userService.createUser(email, password);
     }
-    if (!response) {
-      navigator("/sign-up");
-      this.props.formProps.onChange(false, ["flags", "isActivationEmailSent"]);
+    if (response) {
+      this.props.formProps.onChange(true, ["flags", "isActivationEmailSent"]);
+      navigator("/send-activation-email-link");
     }
   };
 

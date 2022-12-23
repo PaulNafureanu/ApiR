@@ -9,7 +9,7 @@ interface ResetPasswordFormProps {
 
 interface ResetPasswordFormState {
   showGoogleAuthText: boolean;
-  isButtonOnDefaultStyle: boolean;
+  isButtonDisabled: boolean;
   isSignInOnDefaultStyle: boolean;
 }
 
@@ -22,7 +22,7 @@ class ResetPasswordForm extends Form<
   state = {
     showGoogleAuthText: false,
     isSignInOnDefaultStyle: true,
-    isButtonOnDefaultStyle: true,
+    isButtonDisabled: true,
   };
 
   specificState = (): { data: Email; schema: SchemaEmail } => {

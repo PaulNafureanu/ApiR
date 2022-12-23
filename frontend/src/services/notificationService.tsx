@@ -51,8 +51,32 @@ function info(
   toast.info(message, options);
 }
 
+function success(
+  message: string,
+  options: Object = {
+    position: "bottom-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+  }
+) {
+  toast.success(message, options);
+}
+
+function pending<Type>(promise: Promise<Type>) {
+  toast.promise(promise, {
+    pending: "Request is pending . . .",
+  });
+}
+
 export default {
   init,
   warn,
   info,
+  success,
+  pending,
 };

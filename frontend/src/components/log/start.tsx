@@ -25,6 +25,9 @@
  *                        or 400 bad request -> /log-in
  *
  * (4) (Everything else) -> /page-not-found
+ *
+ * (2) (client) /sign-up -> (server) /auth/users -> (client) 201 or 400 -> (client) /send-activation-email-link.
+ *     (client) /confirm-activation -> (server) /auth/users/activation -> (client) 204, 400 or 403
  */
 
 import * as React from "react";

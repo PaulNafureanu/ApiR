@@ -13,7 +13,7 @@ interface SetNewPasswordFormProps {
 
 interface SetNewPasswordFormState {
   showGoogleAuthText: boolean;
-  isButtonOnDefaultStyle: boolean;
+  isButtonDisabled: boolean;
 }
 
 class SetNewPasswordForm extends Form<
@@ -24,7 +24,7 @@ class SetNewPasswordForm extends Form<
 > {
   state = {
     showGoogleAuthText: false,
-    isButtonOnDefaultStyle: true,
+    isButtonDisabled: true,
   };
 
   specificState = (): {
@@ -75,7 +75,9 @@ class SetNewPasswordForm extends Form<
           password
         );
         if (responseSetNewPassword) {
-          notifier.info("Congrats! Your password was successfully changed 😄");
+          notifier.success(
+            "Congrats! Your password was successfully changed 😄"
+          );
           onChange("", ["account", "password"]);
           navigator("/log-in");
         } else {
